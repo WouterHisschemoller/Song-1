@@ -1,0 +1,46 @@
+{
+	"song": {
+		"id": "song1",
+		"beatsPerMinute": 120, 
+		"ticksPerBeat": 480, 
+		"sequences": [
+			"sequence1"
+		]
+	}, 
+	"sequences": [
+		{
+			"id": "sequence1", 
+			"length": 16, 
+			"patterns": [
+				"simpleNoise1", 
+				"filterNoise1"
+			]
+		}
+	], 
+	"patterns": [
+		{
+			"id": "simpleNoise1", 
+			"events": [
+				{ "deltaTime":  0, "type": 144, "data1":  60, "data2":  20, "channel":  0 }, 
+				{ "deltaTime":  3, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
+				{ "deltaTime":  8, "type": 144, "data1":  60, "data2":   5, "channel":  0 }, 
+				{ "deltaTime": 11, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
+				{ "deltaTime": 16, "type": 255, "data1":  47, "data2":   0, "channel":  0 }
+			]
+		}, 
+		{
+			"id": "filterNoise1", 
+			"events": [
+				{ "deltaTime":   2, "type": 144, "data1":  50, "data2": 120, "channel":  1 }, 
+				{ "deltaTime": 2.2, "type": 128, "data1":  50, "data2":   0, "channel":  1 }, 
+				{ "deltaTime": 2.5, "type": 144, "data1":  20, "data2": 100, "channel":  1 }, 
+				{ "deltaTime": 2.7, "type": 128, "data1":  20, "data2":   0, "channel":  1 }, 
+				{ "deltaTime":   6, "type": 144, "data1":  80, "data2": 110, "channel":  1 }, 
+				{ "deltaTime": 6.2, "type": 128, "data1":  80, "data2":   0, "channel":  1 }, 
+				{ "deltaTime": 6.5, "type": 144, "data1": 110, "data2":  90, "channel":  1 }, 
+				{ "deltaTime": 6.7, "type": 128, "data1": 110, "data2":   0, "channel":  1 }, 
+				{ "deltaTime":   8, "type": 255, "data1":  47, "data2":   0, "channel":  1 }
+			]
+		}
+	]
+}

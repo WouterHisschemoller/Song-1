@@ -3,6 +3,7 @@
 		"id": "song1",
 		"beatsPerMinute": 120, 
 		"ticksPerBeat": 480, 
+		"songChannel": 1000, 
 		"sequences": [
 			"sequence1"
 		]

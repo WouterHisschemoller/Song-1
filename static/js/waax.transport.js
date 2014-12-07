@@ -43,6 +43,8 @@
 		this.targets = [];
 		// mui element: pianoroll or score
 		this.views = [];
+		// song timeline pattern
+		this.songPattern;
 
 		// switches
 		this.RUNNING = false;
@@ -174,7 +176,7 @@
 		},
 
 		/**
-		 * Set the timespan to scan for next notes play.
+		 * Set the timespan to scan for next events play.
 		 * @param {Boolean} forced Move scanning timespan to now. Useful when playback position is moved.
 		 */
 		setScanRange: function (forced) {
@@ -246,12 +248,24 @@
 					if (events) {
 						for (var j = 0; j < events.length; j++) {
 							if (this.playbackQ.indexOf(events[j]) < 0) {
-								WX.Log.info('note: ', events[j]);
 								this.playbackQ.push(events[j]);
 							}
 						}
 					}
 				}
+
+				// scan for song events
+				if(this.songPattern) {
+					var events = this.songPattern.scanNotesInTimeSpan(start, end);
+					if (events) {
+						for (var j = 0; j < events.length; j++) {
+							if (this.playbackQ.indexOf(events[j]) < 0) {
+								this.playbackQ.push(events[j]);
+							}
+						}
+					}
+				}
+
 				this.needsScan = false;
 			}
 			// set up next scan if reached the end (check for every 16.7ms)
@@ -263,7 +277,7 @@
 		 */
 		sendData: function () {
 			for (var i = 0; i < this.playbackQ.length; i++) {
-				var event = this.playbackQ[i],
+				var event = this.playbackQ[i],	
 				start = this.absOrigin + this.tick2sec(event.tick);
 				this.targets[event.message.channel].onData(event.message.type, {
 					data1: event.message.data1,
@@ -286,7 +300,7 @@
 		},
 
 		/**
-		 * Getter to test if transport plays at the moment.
+		 * Getter to test if transport is currently playing.
 		 * @return {Boolean} True if playback is running.
 		 */
 		isRunning: function () {
@@ -330,6 +344,17 @@
 		 */
 		addPattern: function (pattern) {
 			this.patterns.push(pattern);
+		},
+
+		/**
+		 * Add a song pattern.
+		 * This pattern contains events that are sent to a WH.Song to trigger sequence changes.
+		 * It is in fact the arrangement of the song.
+		 * Similar to a Song on an Akai MPC.
+		 * @param {WH.Pattern} songPattern A song pattern with Marker events.
+		 */
+		addSongPattern: function (songPattern) {
+			this.songPattern = songPattern;
 		},
 
 		/**

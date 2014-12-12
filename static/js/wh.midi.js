@@ -37,15 +37,20 @@
 	 * Constants
 	 */
 	WH.MidiStatus = {
-		NOTE_OFF: 128, 
-		NOTE_ON: 144, 
-		SYSTEM_RESET: 255, 
-		META_MESSAGE: 255
+		NOTE_OFF: 0x80, // 128
+		NOTE_ON: 0x90, // 144
+		CONTROL_CHANGE: 0xB0, // 176
+		SYSTEM_RESET: 0xFF, // 255, 
+		META_MESSAGE: 0xFF, // 255
 	};
 
 	WH.MidiMetaStatus = {
 		MARKER: 6, 
 		END_OF_TRACK: 47
+	};
+
+	WH.MidiController = {
+		ALL_NOTES_OFF: 0x7B // 123
 	};
 
 })(WH);

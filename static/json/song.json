@@ -3,8 +3,8 @@
 		"id": "song1",
 		"beatsPerMinute": 120, 
 		"ticksPerBeat": 480, 
-		"songChannel": 1000, 
 		"sequences": [
+			"sequence1", 
 			"sequence1"
 		]
 	}, 
@@ -22,10 +22,10 @@
 		{
 			"id": "simpleNoise1", 
 			"events": [
-				{ "deltaTime":  0, "type": 144, "data1":  60, "data2":  20, "channel":  0 }, 
+				{ "deltaTime":  0, "type": 144, "data1":  60, "data2":   7, "channel":  0 }, 
 				{ "deltaTime":  3, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
-				{ "deltaTime":  8, "type": 144, "data1":  60, "data2":   5, "channel":  0 }, 
-				{ "deltaTime": 11, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
+				{ "deltaTime":  8, "type": 144, "data1":  60, "data2":   2, "channel":  0 }, 
+				{ "deltaTime": 13, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
 				{ "deltaTime": 16, "type": 255, "data1":  47, "data2":   0, "channel":  0 }
 			]
 		}, 

@@ -22,9 +22,17 @@
 		 */
 		initFromData: function(sequenceData, patternData) {
 			for(var i = 0; i < sequenceData.patterns.length; i++) {
-				var patternId = sequenceData.patterns[i];
 				var pattern = WH.Pattern(patternData[i]);
+				this.patterns.push(pattern);
 			}
+		}, 
+
+		/**
+		 * Getter for patterns array.
+		 * @return {Array} Array of WH.Pattern objects.
+		 */
+		getPatterns: function() {
+			return this.patterns;
 		}
 	};
 

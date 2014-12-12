@@ -120,6 +120,13 @@
 				case WH.MidiStatus.NOTE_OFF:
 					this.noteOff(data.time);
 					break;
+				case WH.MidiStatus.CONTROL_CHANGE:
+					switch(data.data1) {
+						case WH.MidiController.ALL_NOTES_OFF: 
+							this.noteOff(data.time);
+							break;
+					}
+					break;
 				default: 
 					return;
 			}

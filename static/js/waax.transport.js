@@ -45,6 +45,8 @@
 		this.views = [];
 		// song timeline pattern
 		this.songPattern;
+		// song
+		this.song;
 
 		// switches
 		this.RUNNING = false;
@@ -176,19 +178,15 @@
 		},
 
 		/**
-		 * Set the timespan to scan for next events play.
-		 * @param {Boolean} forced Move scanning timespan to now. Useful when playback position is moved.
+		 * Repaint loop, usually at 60 FPS or 16.67 ms interval.
 		 */
-		setScanRange: function (forced) {
-			if (forced) {
-				this.scanStart = this.now;
-				this.scanEnd =  this.scanStart + this.lookahead;
-				this.needsScan = true;
-			} else if (this.scanEnd - this.now <- 0.0167) {
-				this.scanStart = this.scanEnd;
-				this.scanEnd = this.now + this.lookahead;
-				this.needsScan = true;
-			}
+		_loop: function () {
+			// advance when transport is running
+			this.step();
+			// update any linked view
+			this.updateView();
+			// next
+			requestAnimationFrame(this._loop.bind(this));
 		},
 
 		/**
@@ -206,8 +204,17 @@
 				// scan notes and throw them into playbackQ
 				this.scanEvents();
 
+				// scan and handle song timeline sequence changes
+				this.scanSongEvents();
+
+				if(this.needsScan) {
+					this.needsScan = false;
+				}
+
+				// set up next scan if reached the end (check for every 16.7ms)
+				this.setScanRange();
+
 				// play events found within scanned timespan 
-				// TODO: schedule scanned notes
 				this.sendData();
 
 				// clear playbackQ
@@ -224,13 +231,6 @@
 					}
 				}
 			}
-		},
-
-		/**
-		 * Clear all events from queue.
-		 */
-		flushPlaybackQ: function () {
-			this.playbackQ.length = 0;
 		},
 
 		/**
@@ -253,23 +253,64 @@
 						}
 					}
 				}
+			}
+		},
 
-				// scan for song events
-				if(this.songPattern) {
-					var events = this.songPattern.scanNotesInTimeSpan(start, end);
-					if (events) {
-						for (var j = 0; j < events.length; j++) {
-							if (this.playbackQ.indexOf(events[j]) < 0) {
-								this.playbackQ.push(events[j]);
+		/**
+		 * Scan for song arrangement events.
+		 */
+		scanSongEvents: function () {
+			var songEvents = [];
+			if(this.needsScan && this.songPattern && this.song) {
+				// start and end time in ticks
+				var start = this.sec2tick(this.scanStart),
+				end = this.sec2tick(this.scanEnd);
+				var events = this.songPattern.scanNotesInTimeSpan(start, end);
+				if (events) {
+					for (var i = 0; i < events.length; i++) {
+						// send the events in this timespan to the song, 
+						// on marker events the song will immediately change sequences
+						var event = events[i];
+						var message = event.message;
+						this.song.onData(message.type, {
+							data1: message.data1,
+							data2: message.data2, 
+							time: 0
+						});
+
+						// if the event just sent is a marker event, the old sequence ends
+						// send all-notes-off event on all channels at the moment the sequence ends
+						if(message.type == WH.MidiStatus.META_MESSAGE && message.data1 == WH.MidiMetaStatus.MARKER) {
+							var time = this.absOrigin + this.tick2sec(event.tick * this.TICKS_PER_BEAT);
+							for (var channel in this.targets) {
+								this.playbackQ.push(WH.MidiEvent(time, WH.MidiMessage(
+									WH.MidiStatus.CONTROL_CHANGE, 
+									channel, 
+									WH.MidiController.ALL_NOTES_OFF, 
+									0)));
 							}
+							console.log('marker event at time ', time);
 						}
 					}
 				}
-
-				this.needsScan = false;
 			}
-			// set up next scan if reached the end (check for every 16.7ms)
-			this.setScanRange();
+		}, 
+
+		/**
+		 * Test if the end of the scan range is reached
+		 * Set the timespan to scan for next events play.
+		 * @param {Boolean} forced Move scanning timespan to now. Useful when playback position is moved.
+		 */
+		setScanRange: function (forced) {
+			if (forced) {
+				this.scanStart = this.now;
+				this.scanEnd =  this.scanStart + this.lookahead;
+				this.needsScan = true;
+			} else if (this.scanEnd - this.now <- 0.0167) {
+				this.scanStart = this.scanEnd;
+				this.scanEnd = this.now + this.lookahead;
+				this.needsScan = true;
+			}
 		},
 
 		/**
@@ -277,7 +318,7 @@
 		 */
 		sendData: function () {
 			for (var i = 0; i < this.playbackQ.length; i++) {
-				var event = this.playbackQ[i],	
+				var event = this.playbackQ[i], 
 				start = this.absOrigin + this.tick2sec(event.tick);
 				this.targets[event.message.channel].onData(event.message.type, {
 					data1: event.message.data1,
@@ -288,15 +329,10 @@
 		},
 
 		/**
-		 * Repaint loop, usually at 60 FPS or 16.67 ms interval.
+		 * Clear all events from queue.
 		 */
-		_loop: function () {
-			// advance when transport is running
-			this.step();
-			// update any linked view
-			this.updateView();
-			// next
-			requestAnimationFrame(this._loop.bind(this));
+		flushPlaybackQ: function () {
+			this.playbackQ.length = 0;
 		},
 
 		/**
@@ -347,6 +383,22 @@
 		},
 
 		/**
+		 * Add an array of patterns pattern.
+		 * @param {Array} patterns Array of WH.Pattern objects.
+		 */
+		addPatterns: function (patterns) {
+			this.patterns = this.patterns.concat(patterns);
+			console.log('addPatterns this.patterns: ', this.patterns);
+		}, 
+
+		/**
+		 * Clear the list of patterns.
+		 */ 
+		clearPatterns: function() {
+			this.patterns = [];
+		}, 
+
+		/**
 		 * Add a song pattern.
 		 * This pattern contains events that are sent to a WH.Song to trigger sequence changes.
 		 * It is in fact the arrangement of the song.
@@ -355,6 +407,14 @@
 		 */
 		addSongPattern: function (songPattern) {
 			this.songPattern = songPattern;
+		},
+
+		/**
+		 * 
+		 * @param {WH.Song} song Song object 
+		 */
+		addSong: function (song) {
+			this.song = song;
 		},
 
 		/**

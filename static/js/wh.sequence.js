@@ -4,9 +4,11 @@
 	 * @constructor
 	 * @param {Object} sequenceData Sequence data object.
 	 * @param {Array} patternData Array of pattern data objects.
+	 * @param {Number} startTick Sequence start tick in song arrangement.
 	 */
-	function Sequence(sequenceData, patternData) {
+	function Sequence(sequenceData, patternData, startTick) {
 		this.patterns = [];
+		this.startTick = startTick;
 		if(sequenceData && patternData) {
 			this.initFromData(sequenceData, patternData);
 		}
@@ -28,19 +30,45 @@
 		}, 
 
 		/**
-		 * Getter for patterns array.
-		 * @return {Array} Array of WH.Pattern objects.
+		 * Scan events within time range.
+		 * @param {Number} start Start tick of time range.
+		 * @param {Number} end End tick of time range.
+		 * @return {Array} Events that happen within the time range.
 		 */
-		getPatterns: function() {
-			return this.patterns;
+		scanEvents: function (start, end) {
+			// convert song time to sequence time
+			var localStart = start - this.startTick;
+			var localEnd = end - this.startTick;
+			var playbackQ = [];
+			// scan for events
+			for (var i = 0; i < this.patterns.length; i++) {
+				var events = this.patterns[i].scanEventsInTimeSpan(localStart, localEnd);
+				// push notes into playbackQ
+				if (events) {
+					for (var j = 0; j < events.length; j++) {
+						if (playbackQ.indexOf(events[j]) < 0) {
+							playbackQ.push(events[j]);
+						}
+					}
+				}
+			}
+			return playbackQ;
+		}, 
+
+		/**
+		 * Getter for startTick.
+		 * @return {Number} startTick Time at which this sequence starts.
+		 */
+		getStartTick: function() {
+			return this.startTick;
 		}
 	};
 
 	/** 
 	 * Exports
 	 */
-	WH.Sequence = function (sequenceData, patternData) {
-		return new Sequence(sequenceData, patternData);
+	WH.Sequence = function (sequenceData, patternData, startTick) {
+		return new Sequence(sequenceData, patternData, startTick);
 	};
 
 })(WH);

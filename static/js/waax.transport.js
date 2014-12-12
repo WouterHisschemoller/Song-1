@@ -28,6 +28,7 @@
 		this.loopEnd = 0.0;
 		this.lookahead = 0.0;
 
+		// scan start and end time in seconds
 		this.scanStart = 0.0;
 		this.scanEnd = this.lookahead;
 		this.needsScan = true;
@@ -38,13 +39,10 @@
 
 		// playback queue, connected notelists, views
 		this.playbackQ = [];
-		this.patterns = [];
 		// plugin target
 		this.targets = [];
 		// mui element: pianoroll or score
 		this.views = [];
-		// song timeline pattern
-		this.songPattern;
 		// song
 		this.song;
 
@@ -204,13 +202,6 @@
 				// scan notes and throw them into playbackQ
 				this.scanEvents();
 
-				// scan and handle song timeline sequence changes
-				this.scanSongEvents();
-
-				if(this.needsScan) {
-					this.needsScan = false;
-				}
-
 				// set up next scan if reached the end (check for every 16.7ms)
 				this.setScanRange();
 
@@ -239,60 +230,11 @@
 		scanEvents: function () {
 			if (this.needsScan) {
 				// start and end time in ticks
-				var start = this.sec2tick(this.scanStart),
-				end = this.sec2tick(this.scanEnd);
-				// iterate multiple patterns
-				for (var i = 0; i < this.patterns.length; i++) {
-					var events = this.patterns[i].scanNotesInTimeSpan(start, end);
-					// push notes into playbackQ
-					if (events) {
-						for (var j = 0; j < events.length; j++) {
-							if (this.playbackQ.indexOf(events[j]) < 0) {
-								this.playbackQ.push(events[j]);
-							}
-						}
-					}
-				}
-			}
-		},
-
-		/**
-		 * Scan for song arrangement events.
-		 */
-		scanSongEvents: function () {
-			var songEvents = [];
-			if(this.needsScan && this.songPattern && this.song) {
-				// start and end time in ticks
-				var start = this.sec2tick(this.scanStart),
-				end = this.sec2tick(this.scanEnd);
-				var events = this.songPattern.scanNotesInTimeSpan(start, end);
-				if (events) {
-					for (var i = 0; i < events.length; i++) {
-						// send the events in this timespan to the song, 
-						// on marker events the song will immediately change sequences
-						var event = events[i];
-						var message = event.message;
-						this.song.onData(message.type, {
-							data1: message.data1,
-							data2: message.data2, 
-							time: 0
-						});
-
-						// if the event just sent is a marker event, the old sequence ends
-						// send all-notes-off event on all channels at the moment the sequence ends
-						if(message.type == WH.MidiStatus.META_MESSAGE && message.data1 == WH.MidiMetaStatus.MARKER) {
-							var time = this.absOrigin + this.tick2sec(event.tick * this.TICKS_PER_BEAT);
-							for (var channel in this.targets) {
-								this.playbackQ.push(WH.MidiEvent(time, WH.MidiMessage(
-									WH.MidiStatus.CONTROL_CHANGE, 
-									channel, 
-									WH.MidiController.ALL_NOTES_OFF, 
-									0)));
-							}
-							console.log('marker event at time ', time);
-						}
-					}
-				}
+				var start = this.sec2tick(this.scanStart);
+				var end = this.sec2tick(this.scanEnd);
+				var events = this.song.scanEvents(start, end);
+				this.playbackQ = this.playbackQ.concat(events);
+				this.needsScan = false;
 			}
 		}, 
 
@@ -319,7 +261,7 @@
 		sendData: function () {
 			for (var i = 0; i < this.playbackQ.length; i++) {
 				var event = this.playbackQ[i], 
-				start = this.absOrigin + this.tick2sec(event.tick);
+				start = this.absOrigin + this.tick2sec(this.now + event.tick);
 				this.targets[event.message.channel].onData(event.message.type, {
 					data1: event.message.data1,
 					data2: event.message.data2,
@@ -349,7 +291,6 @@
 		start: function () {
 			// flush queue and reset scanner position
 			this.flushPlaybackQ();
-			// this.setScanPosition(this.now);
 			// arrange time references
 			var absNow = WX.now;
 			this.absOrigin = absNow - this.now;
@@ -373,40 +314,6 @@
 		rewind: function () {
 			this.setNowInSec(0.0);
 			this.setScanRange(true);
-		},
-
-		/**
-		 * Add a new pattern.
-		 */
-		addPattern: function (pattern) {
-			this.patterns.push(pattern);
-		},
-
-		/**
-		 * Add an array of patterns pattern.
-		 * @param {Array} patterns Array of WH.Pattern objects.
-		 */
-		addPatterns: function (patterns) {
-			this.patterns = this.patterns.concat(patterns);
-			console.log('addPatterns this.patterns: ', this.patterns);
-		}, 
-
-		/**
-		 * Clear the list of patterns.
-		 */ 
-		clearPatterns: function() {
-			this.patterns = [];
-		}, 
-
-		/**
-		 * Add a song pattern.
-		 * This pattern contains events that are sent to a WH.Song to trigger sequence changes.
-		 * It is in fact the arrangement of the song.
-		 * Similar to a Song on an Akai MPC.
-		 * @param {WH.Pattern} songPattern A song pattern with Marker events.
-		 */
-		addSongPattern: function (songPattern) {
-			this.songPattern = songPattern;
 		},
 
 		/**
@@ -441,7 +348,6 @@
 		addTarget: function (channel, plugin) {
 			this.targets[channel] = plugin;
 		}
-
 	};
 
 	WX.Transport = new Transport(120);

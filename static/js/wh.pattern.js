@@ -47,13 +47,14 @@
 		 * @param {Number} end End time in ticks.
 		 * @return {Array} An array with the events to be played within the time span.
 		 */
-		scanNotesInTimeSpan: function (start, end) {
+		scanEventsInTimeSpan: function (start, end) {
 			var bucket = [];
 			for (var id in this.events) {
 				var event = this.events[id];
 				if (event) {
 					if (start <= event.tick && event.tick <= end) {
-						bucket.push(event);
+						// add new event with time relative to time span
+						bucket.push(WH.MidiEvent((event.tick - start), event.message));
 					}
 				}
 			}

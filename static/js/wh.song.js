@@ -7,10 +7,8 @@
 	/**
 	 * @constructor
 	 * @param {Object} data Song data object.
-	 * @param {WX.Transport} transport Song playback engine.
 	 */
-	function Song(data, transport) {
-		this.transport = transport;
+	function Song(data) {
 		// array of sequences that form the arrangement of the song
 		this.sequences = [];
 		this.sequenceIndex = -1;
@@ -18,7 +16,7 @@
 		this.songLength = 0;
 		// initialize song structure from loaded json data
 		if(data) {
-			this.initFromData(data, transport);
+			this.initFromData(data);
 		}
 	}
 
@@ -27,7 +25,6 @@
 		/**
 		 * Initialize song structure from data object.
 		 * Create an array of sequences and
-		 * build a song timeline pattern to add to the transport.
 		 * @param {Object} data Song data object.
 		 */
 		initFromData: function(data) {
@@ -61,9 +58,6 @@
 					}
 				}
 			}
-
-			// add Song to Transport
-			this.transport.addSong(this);
 		},
 
 		/**
@@ -127,8 +121,8 @@
 	/** 
 	 * Exports
 	 */
-	WH.Song = function (data, transport) {
-		return new Song(data, transport);
+	WH.Song = function (data) {
+		return new Song(data);
 	};
 
 })(WH);

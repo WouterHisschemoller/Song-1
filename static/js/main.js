@@ -7,7 +7,7 @@ $(function() {
 	this.onDataLoaded = function(data) {
 		var view = new View('canvas');
 
-		var song = WH.Song(data, WX.Transport);
+		var song = WH.Song(data);
 
 		var osc = WX.SimpleOsc();
 		osc.to(WX.Master);
@@ -22,17 +22,12 @@ $(function() {
 		filterNoise.to(WX.Master);
 		filterNoise.setView(view);
 
-		// var pattern1 = WH.Pattern(data.patterns[0]);
-		// var pattern2 = WH.Pattern(data.patterns[1]);
-
 
 		// Initialize Transport with song settings.
 		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);
+		WX.Transport.addSong(song);
 		WX.Transport.addTarget(0, simpleNoise);
 		WX.Transport.addTarget(1, filterNoise);
-		// WX.Transport.addPattern(pattern1);
-		// WX.Transport.addPattern(pattern2);
-		// WX.Transport.setLoop(0, data.song.ticksPerBeat * 16);
 		WX.Transport.start();
 	}
 

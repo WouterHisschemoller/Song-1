@@ -9,6 +9,10 @@
 
 		this.TICKS_PER_BEAT = 480;
 
+		// beats, ticks in seconds
+		this.BIS = 0.0;
+		this.TIS = 0.0;
+
 		// NOTES:
 		// - absolute time: time expressed in audioContext time
 		// - sec: linear time in seconds
@@ -33,10 +37,6 @@
 		this.scanEnd = this.lookahead;
 		this.needsScan = true;
 
-		// beats, ticks in seconds
-		this.BIS = 0.0;
-		this.TIS = 0.0;
-
 		// playback queue, connected notelists, views
 		this.playbackQ = [];
 		// plugin target
@@ -47,9 +47,8 @@
 		this.song;
 
 		// switches
-		this.RUNNING = false;
-		this.LOOP = false;
-		this.USE_METRONOME = false;
+		this.isRunning = false;
+		this.isLoop = false;
 
 		// init BPM and initiate loop
 		this.setBPM(BPM);
@@ -167,11 +166,11 @@
 			if(start != null && end != null) {
 				this.loopStart = this.tick2sec(start);
 				this.loopEnd = this.tick2sec(end);
-				this.LOOP = true;
+				this.isLoop = true;
 			} else {
 				this.loopStart = 0.0;
 				this.loopEnd = 0.0;
-				this.LOOP = false;
+				this.isLoop = false;
 			}
 		},
 
@@ -193,7 +192,7 @@
 		 */
 		step: function () {
 			// only transport if in 'play'
-			if (this.RUNNING) {
+			if (this.isRunning) {
 				// advancing, gets new absolute now
 				var absNow = WX.now;
 				this.now += (absNow - this.absOldNow);
@@ -212,7 +211,7 @@
 				this.flushPlaybackQ();
 
 				// handle looping
-				if (this.LOOP) {
+				if (this.isLoop) {
 					// if the end of the loop occurs within the lookahead time
 					if (this.loopEnd - (this.now + this.lookahead) < 0) {
 						// set time to loop start time minus the bit to go until loop end,
@@ -282,7 +281,7 @@
 		 * @return {Boolean} True if playback is running.
 		 */
 		isRunning: function () {
-			return this.RUNNING;
+			return this.isRunning;
 		},
 
 		/**
@@ -296,7 +295,7 @@
 			this.absOrigin = absNow - this.now;
 			this.absOldNow = absNow;
 			// toggle switch
-			this.RUNNING = true;
+			this.isRunning = true;
 			this.setScanRange(true);
 		},
 
@@ -304,7 +303,7 @@
 		 * Pause playback.
 		 */
 		pause: function () {
-			this.RUNNING = false;
+			this.isRunning = false;
 			this.flushPlaybackQ();
 		},
 

@@ -234,6 +234,27 @@
 				var events = this.song.scanEvents(start, end);
 				this.playbackQ = this.playbackQ.concat(events);
 				this.needsScan = false;
+
+				// if a new sequence started during this time range, 
+				// there will be song events
+				// get the events and add them to the playbackQ for all channels
+				var songEvents = this.song.getScannedSongEvents();
+				for (var i = 0; i < songEvents.length; i++) {
+					var event = songEvents[i];
+					if(event.message.type == WH.MidiStatus.CONTROL_CHANGE &&
+						event.message.data1 == WH.MidiController.ALL_SOUND_OFF) {
+				 		for (channel in this.targets) {
+							// note: put all-note-off events at start of queue so they
+							// won't stop events that start on the same tick
+				 			this.playbackQ.unshift(WH.MidiEvent(event.tick, WH.MidiMessage(
+				 				WH.MidiStatus.CONTROL_CHANGE,
+								channel,
+								WH.MidiController.ALL_NOTES_OFF,
+								0))
+							);
+						}
+					}
+				}
 			}
 		}, 
 

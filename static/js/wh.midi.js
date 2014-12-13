@@ -45,12 +45,13 @@
 	};
 
 	WH.MidiMetaStatus = {
-		MARKER: 6, 
-		END_OF_TRACK: 47
+		MARKER: 6, // start of a sequence in the song
+		END_OF_TRACK: 47 // end of the last sequence in the song
 	};
 
 	WH.MidiController = {
-		ALL_NOTES_OFF: 0x7B // 123
+		ALL_SOUND_OFF: 0x78, // 120, stop all sounds on a all channels
+		ALL_NOTES_OFF: 0x7B // 123, stop all sounds on a specific channel
 	};
 
 })(WH);

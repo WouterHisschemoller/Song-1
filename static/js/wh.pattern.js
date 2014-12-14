@@ -19,23 +19,42 @@
 		 * @param {Object} data Pattern data object.
 		 */
 		initFromData: function(data) {
+
+			this.length = data.length * 480;
+
 			for(var i = 0; i < data.events.length; i++) {
 
 				// create event from data
 				var event = data.events[i];
-				this.push(WH.MidiEvent(
-					Math.floor(event.deltaTime * 480), 
-					WH.MidiMessage(
-						event.type, 
-						event.channel, 
-						event.data1, 
-						event.data2)));
-
-				// look for end-of-track meta event to set pattern length
-				if(event.type == WH.MidiStatus.META_MESSAGE
-					&& event.data1 == WH.MidiMetaStatus.END_OF_TRACK) {
-					this.length = event.deltaTime * 480;
+				switch(event[0]) {
+					case 'note': 
+						// note-on
+						this.push(WH.MidiEvent(
+							Math.floor(event[1] * 480), 
+							WH.MidiMessage(
+								WH.MidiStatus.NOTE_ON, 
+								data.channel, 
+								event[3], 
+								event[4])));
+						// note-off
+						this.push(WH.MidiEvent(
+							Math.floor((event[1] + event[2]) * 480), 
+							WH.MidiMessage(
+								WH.MidiStatus.NOTE_OFF, 
+								data.channel, 
+								event[3], 
+								0)));
+						break;
 				}
+
+				// add end-of-track meta event
+				this.push(WH.MidiEvent(
+					Math.floor(this.length), 
+					WH.MidiMessage(
+						WH.MidiStatus.META_MESSAGE, 
+						data.channel, 
+						WH.MidiMetaStatus.END_OF_TRACK, 
+						0)));
 			}
 		},
 

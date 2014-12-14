@@ -4,56 +4,50 @@
 		"beatsPerMinute": 120, 
 		"ticksPerBeat": 480, 
 		"sequences": [
-			"sequence1", 
-			"sequence1"
+			"sequence_01", 
+			"sequence_01"
 		]
 	}, 
 	"sequences": [
 		{
-			"id": "sequence1", 
+			"id": "sequence_01", 
 			"length": 16, 
 			"patterns": [
-				"simpleNoise1", 
-				"filterNoise1", 
-				"shortSine"
+				"simplenoise_01", 
+				"filternoise_01", 
+				"shortsine_01"
 			]
 		}
 	], 
 	"patterns": [
 		{
-			"id": "simpleNoise1", 
+			"id": "simplenoise_01", 
+			"channel": 0, 
+			"length": 16, 
 			"events": [
-				{ "deltaTime":  0, "type": 144, "data1":  60, "data2":   7, "channel":  0 }, 
-				{ "deltaTime":  3, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
-				{ "deltaTime":  8, "type": 144, "data1":  60, "data2":   2, "channel":  0 }, 
-				{ "deltaTime": 13, "type": 128, "data1":  60, "data2":   0, "channel":  0 }, 
-				{ "deltaTime": 16, "type": 255, "data1":  47, "data2":   0, "channel":  0 }
+				[ "note", 0.0, 2.0,  60,   7 ], 
+				[ "note", 8.0, 5.0,  60,   2 ]
 			]
 		}, 
 		{
-			"id": "filterNoise1", 
+			"id": "filternoise_01", 
+			"channel": 1, 
+			"length": 16, 
 			"events": [
-				{ "deltaTime":   2, "type": 144, "data1":  50, "data2": 120, "channel":  1 }, 
-				{ "deltaTime": 2.2, "type": 128, "data1":  50, "data2":   0, "channel":  1 }, 
-				{ "deltaTime": 2.5, "type": 144, "data1":  20, "data2": 100, "channel":  1 }, 
-				{ "deltaTime": 2.7, "type": 128, "data1":  20, "data2":   0, "channel":  1 }, 
-				{ "deltaTime":   6, "type": 144, "data1":  80, "data2": 110, "channel":  1 }, 
-				{ "deltaTime": 6.2, "type": 128, "data1":  80, "data2":   0, "channel":  1 }, 
-				{ "deltaTime": 6.5, "type": 144, "data1": 110, "data2":  90, "channel":  1 }, 
-				{ "deltaTime": 6.7, "type": 128, "data1": 110, "data2":   0, "channel":  1 }, 
-				{ "deltaTime":   8, "type": 255, "data1":  47, "data2":   0, "channel":  1 }
+				[ "note", 2.0, 0.2,  50, 120 ], 
+				[ "note", 2.5, 0.2,  20, 100 ], 
+				[ "note", 6.0, 0.2,  80, 110 ], 
+				[ "note", 6.5, 0.2, 110,  90 ]
 			]
 		}, 
 		{
-			"id": "shortSine", 
+			"id": "shortsine_01", 
+			"channel": 2, 
+			"length": 4.5, 
 			"events": [
-				{ "deltaTime": 0.5, "type": 144, "data1":  60, "data2": 120, "channel":  2 }, 
-				{ "deltaTime": 0.7, "type": 128, "data1":  60, "data2":   0, "channel":  2 }, 
-				{ "deltaTime":0.75, "type": 144, "data1":  64, "data2":  90, "channel":  2 }, 
-				{ "deltaTime":0.85, "type": 128, "data1":  64, "data2":   0, "channel":  2 }, 
-				{ "deltaTime":1.25, "type": 144, "data1":  56, "data2": 110, "channel":  2 }, 
-				{ "deltaTime":1.35, "type": 128, "data1":  56, "data2":   0, "channel":  2 }, 
-				{ "deltaTime": 3.5, "type": 255, "data1":  47, "data2":   0, "channel":  2 }
+				[ "note", 0.5, 0.2,  60, 120 ], 
+				[ "note",0.75, 0.1,  64,  30 ], 
+				[ "note",1.25, 0.1,  56, 80 ]
 			]
 		}
 	]

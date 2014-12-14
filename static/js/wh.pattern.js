@@ -6,6 +6,7 @@
 	function Pattern(data) {
 		this.events = {};
 		this.size = 0;
+		this.length = 0;
 		if(data) {
 			this.initFromData(data);
 		}
@@ -19,8 +20,22 @@
 		 */
 		initFromData: function(data) {
 			for(var i = 0; i < data.events.length; i++) {
-				var e = data.events[i];
-				this.push(WH.MidiEvent(Math.floor(e.deltaTime * 480), WH.MidiMessage(e.type, e.channel, e.data1, e.data2)));
+
+				// create event from data
+				var event = data.events[i];
+				this.push(WH.MidiEvent(
+					Math.floor(event.deltaTime * 480), 
+					WH.MidiMessage(
+						event.type, 
+						event.channel, 
+						event.data1, 
+						event.data2)));
+
+				// look for end-of-track meta event to set pattern length
+				if(event.type == WH.MidiStatus.META_MESSAGE
+					&& event.data1 == WH.MidiMetaStatus.END_OF_TRACK) {
+					this.length = event.deltaTime * 480;
+				}
 			}
 		},
 
@@ -41,20 +56,26 @@
 
 		/**
 		 * Find events to be played within a time span
-		 * NOTE: this returns event, not event id
+		 * If the pattern is shorter than the sequence, the pattern will loop.
 		 * 
 		 * @param {Number} start Start time in ticks.
 		 * @param {Number} end End time in ticks.
 		 * @return {Array} An array with the events to be played within the time span.
 		 */
 		scanEventsInTimeSpan: function (start, end) {
+
+			// convert sequence time to pattern time
+			var localStart = start % this.length;
+			var localEnd = localStart + (end - start);
+
+			// get the events
 			var bucket = [];
 			for (var id in this.events) {
 				var event = this.events[id];
 				if (event) {
-					if (start <= event.tick && event.tick <= end) {
+					if (localStart <= event.tick && event.tick <= localEnd) {
 						// add new event with time relative to time span
-						bucket.push(WH.MidiEvent((event.tick - start), event.message));
+						bucket.push(WH.MidiEvent((event.tick - localStart), event.message));
 					}
 				}
 			}

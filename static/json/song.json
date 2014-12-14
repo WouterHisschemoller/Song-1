@@ -14,7 +14,8 @@
 			"length": 16, 
 			"patterns": [
 				"simpleNoise1", 
-				"filterNoise1"
+				"filterNoise1", 
+				"shortSine"
 			]
 		}
 	], 
@@ -41,6 +42,18 @@
 				{ "deltaTime": 6.5, "type": 144, "data1": 110, "data2":  90, "channel":  1 }, 
 				{ "deltaTime": 6.7, "type": 128, "data1": 110, "data2":   0, "channel":  1 }, 
 				{ "deltaTime":   8, "type": 255, "data1":  47, "data2":   0, "channel":  1 }
+			]
+		}, 
+		{
+			"id": "shortSine", 
+			"events": [
+				{ "deltaTime": 0.5, "type": 144, "data1":  60, "data2": 120, "channel":  2 }, 
+				{ "deltaTime": 0.7, "type": 128, "data1":  60, "data2":   0, "channel":  2 }, 
+				{ "deltaTime":0.75, "type": 144, "data1":  64, "data2":  90, "channel":  2 }, 
+				{ "deltaTime":0.85, "type": 128, "data1":  64, "data2":   0, "channel":  2 }, 
+				{ "deltaTime":1.25, "type": 144, "data1":  56, "data2": 110, "channel":  2 }, 
+				{ "deltaTime":1.35, "type": 128, "data1":  56, "data2":   0, "channel":  2 }, 
+				{ "deltaTime": 3.5, "type": 255, "data1":  47, "data2":   0, "channel":  2 }
 			]
 		}
 	]

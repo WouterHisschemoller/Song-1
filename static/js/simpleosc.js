@@ -133,20 +133,32 @@
 
     noteOff: function (time) {
       time = (time || WX.now);
-      this._amp.gain.set(0.0, [time, 0.2], 3);
+      this._amp.gain.set(0.0, [time, 0.02], 3);
     },
 
+    /**
+     * Receive timed data from WX.Transport.
+     * 
+     * @param {string} action Type of event received.
+     * @param {Object} data Properties data1 {number}, data2 {number}, time {number}.
+     */
     onData: function (action, data) {
       switch (action) {
-        case 'noteon':
-          this.noteOn(data.data1, data.data2);
+        case WH.MidiStatus.NOTE_ON:
+          this.noteOn(data.data1, data.data2, data.time);
           break;
-        case 'glide':
-          this.glide(data.data1);
+        case WH.MidiStatus.NOTE_OFF:
+          this.noteOff(data.time);
           break;
-        case 'noteoff':
-          this.noteOff();
+        case WH.MidiStatus.CONTROL_CHANGE:
+          switch(data.data1) {
+            case WH.MidiController.ALL_NOTES_OFF: 
+              this.noteOff(data.time);
+              break;
+          }
           break;
+        default: 
+          return;
       }
     }
 

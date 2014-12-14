@@ -28,6 +28,7 @@ $(function() {
 		WX.Transport.addSong(song);
 		WX.Transport.addTarget(0, simpleNoise);
 		WX.Transport.addTarget(1, filterNoise);
+		WX.Transport.addTarget(2, osc);
 		WX.Transport.start();
 	}
 

@@ -87,6 +87,15 @@
 			var localStart = start % this.length;
 			var localEnd = localStart + (end - start);
 
+			// if the pattern restarts within the current time span, 
+			// scan the bit at the start of the next loop as well
+			var isRestart = false;
+			if(localEnd > this.length) {
+				secondStart = 0;
+				secondEnd = localEnd - this.length;
+				isRestart = true;
+			}
+
 			// get the events
 			var bucket = [];
 			for (var id in this.events) {
@@ -96,8 +105,13 @@
 						// add new event with time relative to time span
 						bucket.push(WH.MidiEvent((event.tick - localStart), event.message));
 					}
+					if(isRestart && secondStart <= event.tick && event.tick <= secondEnd) {
+						// add new event with time relative to time span
+						bucket.push(WH.MidiEvent((event.tick - secondStart), event.message));
+					}
 				}
 			}
+
 			return (bucket.length > 0) ? bucket : null;
 		},
 	};

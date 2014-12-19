@@ -46,16 +46,16 @@
 								0)));
 						break;
 				}
-
-				// add end-of-track meta event
-				this.push(WH.MidiEvent(
-					Math.floor(this.length), 
-					WH.MidiMessage(
-						WH.MidiStatus.META_MESSAGE, 
-						data.channel, 
-						WH.MidiMetaStatus.END_OF_TRACK, 
-						0)));
 			}
+
+			// add end-of-track meta event
+			this.push(WH.MidiEvent(
+				Math.floor(this.length), 
+				WH.MidiMessage(
+					WH.MidiStatus.META_MESSAGE, 
+					data.channel, 
+					WH.MidiMetaStatus.END_OF_TRACK, 
+					0)));
 		},
 
 		/**

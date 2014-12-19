@@ -88,7 +88,7 @@
 				this.sequenceIndex = 0;
 			}
 			
-			if(this.songEvents) {
+			if(this.songEvents.length) {
 				// scan patterns in current sequence for events
 				if(this.sequenceIndex >= 0 && this.sequenceIndex < this.sequences.length) {
 					var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd);

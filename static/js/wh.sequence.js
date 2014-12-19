@@ -24,8 +24,12 @@
 		 */
 		initFromData: function(sequenceData, patternData) {
 			for(var i = 0; i < sequenceData.patterns.length; i++) {
-				var pattern = WH.Pattern(patternData[i]);
-				this.patterns.push(pattern);
+				for(var j = 0; j < patternData.length; j++) {
+					if(sequenceData.patterns[i] == patternData[j].id) {
+						var pattern = WH.Pattern(patternData[j]);
+						this.patterns.push(pattern);
+					}
+				}
 			}
 		}, 
 

@@ -4,7 +4,6 @@
 		"beatsPerMinute": 120, 
 		"ticksPerBeat": 480, 
 		"sequences": [
-			"sequence_01", 
 			"sequence_01"
 		]
 	}, 
@@ -15,8 +14,15 @@
 			"patterns": [
 				"simplenoise_01", 
 				"filternoise_01", 
-				"shortsine_01"
+				"click_01"
 			]
+		}, 
+		{
+			"id": "click_only", 
+			"length": 4, 
+			"patterns": [
+				"click_01"
+			] 
 		}
 	], 
 	"patterns": [
@@ -48,6 +54,17 @@
 				[ "note", 0.5, 0.2,  60, 120 ], 
 				[ "note",0.75, 0.1,  64,  30 ], 
 				[ "note",1.25, 0.1,  56, 80 ]
+			]
+		}, 
+		{
+			"id": "click_01", 
+			"channel": 2, 
+			"length": 4, 
+			"events": [
+				[ "note", 0.0, 0.2,  60, 120 ], 
+				[ "note", 1.0, 0.2,  60, 120 ], 
+				[ "note", 2.0, 0.2,  60, 120 ], 
+				[ "note", 3.0, 0.2,  60, 120 ]
 			]
 		}
 	]

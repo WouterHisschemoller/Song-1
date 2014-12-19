@@ -49,20 +49,17 @@
 		 * Scan events within time range.
 		 * @param {Number} start Start tick of time range.
 		 * @param {Number} end End tick of time range.
-		 * @return {Array} Events that happen within the time range.
+		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
-		scanEvents: function (start, end) {
+		scanEvents: function (start, end, playbackQ) {
 
 			// convert transport time to song time
 			var localStart = start % this.songLength;
 			var localEnd = localStart + (end - start);
 			
-			var playbackQ = [];
-			
 			// scan patterns in current sequence for events
 			if(this.sequenceIndex >= 0 && this.sequenceIndex < this.sequences.length) {
-				var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd);
-				playbackQ = playbackQ.concat(events);
+				var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd, playbackQ);
 			}
 
 			// test if sequences change
@@ -91,12 +88,9 @@
 			if(this.songEvents.length) {
 				// scan patterns in current sequence for events
 				if(this.sequenceIndex >= 0 && this.sequenceIndex < this.sequences.length) {
-					var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd);
-					playbackQ = playbackQ.concat(events);
+					var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd, playbackQ);
 				}
 			}
-
-			return playbackQ;
 		}, 
 
 		/**

@@ -231,8 +231,7 @@
 				// start and end time in ticks
 				var start = this.sec2tick(this.scanStart);
 				var end = this.sec2tick(this.scanEnd);
-				var events = this.song.scanEvents(start, end);
-				this.playbackQ = this.playbackQ.concat(events);
+				var events = this.song.scanEvents(start, end, this.playbackQ);
 				this.needsScan = false;
 
 				// if a new sequence started during this time range, 

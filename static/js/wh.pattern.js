@@ -79,9 +79,9 @@
 		 * 
 		 * @param {Number} start Start time in ticks.
 		 * @param {Number} end End time in ticks.
-		 * @return {Array} An array with the events to be played within the time span.
+		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
-		scanEventsInTimeSpan: function (start, end) {
+		scanEventsInTimeSpan: function (start, end, playbackQ) {
 
 			// convert sequence time to pattern time
 			var localStart = start % this.length;
@@ -89,30 +89,26 @@
 
 			// if the pattern restarts within the current time span, 
 			// scan the bit at the start of the next loop as well
-			var isRestart = false;
+			var secondEnd = 0;
 			if(localEnd > this.length) {
-				secondStart = 0;
+				var secondStart = 0;
 				secondEnd = localEnd - this.length;
-				isRestart = true;
 			}
 
 			// get the events
-			var bucket = [];
 			for (var id in this.events) {
 				var event = this.events[id];
 				if (event) {
 					if (localStart <= event.tick && event.tick <= localEnd) {
 						// add new event with time relative to time span
-						bucket.push(WH.MidiEvent((event.tick - localStart), event.message));
+						playbackQ.push(WH.MidiEvent((event.tick - localStart), event.message));
 					}
-					if(isRestart && secondStart <= event.tick && event.tick <= secondEnd) {
+					if(secondEnd && secondStart <= event.tick && event.tick <= secondEnd) {
 						// add new event with time relative to time span
-						bucket.push(WH.MidiEvent((event.tick - secondStart), event.message));
+						playbackQ.push(WH.MidiEvent((event.tick - secondStart), event.message));
 					}
 				}
 			}
-
-			return (bucket.length > 0) ? bucket : null;
 		},
 	};
 

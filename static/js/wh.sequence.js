@@ -37,26 +37,16 @@
 		 * Scan events within time range.
 		 * @param {Number} start Start tick of time range.
 		 * @param {Number} end End tick of time range.
-		 * @return {Array} Events that happen within the time range.
+		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
-		scanEvents: function (start, end) {
+		scanEvents: function (start, end, playbackQ) {
 			// convert song time to sequence time
 			var localStart = start - this.startTick;
 			var localEnd = end - this.startTick;
-			var playbackQ = [];
 			// scan for events
 			for (var i = 0; i < this.patterns.length; i++) {
-				var events = this.patterns[i].scanEventsInTimeSpan(localStart, localEnd);
-				// push notes into playbackQ
-				if (events) {
-					for (var j = 0; j < events.length; j++) {
-						if (playbackQ.indexOf(events[j]) < 0) {
-							playbackQ.push(events[j]);
-						}
-					}
-				}
+				var events = this.patterns[i].scanEventsInTimeSpan(localStart, localEnd, playbackQ);
 			}
-			return playbackQ;
 		}, 
 
 		/**

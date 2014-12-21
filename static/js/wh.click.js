@@ -1,6 +1,11 @@
 /**
  * Click generates a short percussive click sound.
  * 
+ * MIDI pitch sets filter type and frequency:
+ * Values 0 to 63 set lowpass from 40 to 1000 Hz.
+ * Values 64 to 127 set highpass from 100 to 10000 Hz.
+ *
+ * MIDI velocity sets volume.
  * 
  * @wapl Click
  * @author Wouter Hisschemöller
@@ -11,7 +16,9 @@
 	'use strict';
 
 	/**
-	 * [ClickVoice description]
+	 * ClickVoice is a single voice used by the Click generator defined below.
+	 * A ClickVoice object is used only once and then discarded.
+	 * 
 	 * @constructor
 	 * @param {Click} generator Click generator that plays these voices.
 	 * @param {AudioBuffer} buffer AudioBuffer containing the click sample.
@@ -20,9 +27,11 @@
 	function ClickVoice(output, buffer) {
 	    this._src = WX.Source();
 	    this._src.buffer = buffer;
+	    this._filter = WX.Filter();
+	    this._filter.Q.value = 10; // 0.0001 to 1000, default 1
 	    this._gain = WX.Gain();
 	    this._gain.gain.value = 1.0;
-	    this._src.to(this._gain).to(output);
+	    this._src.to(this._filter).to(this._gain).to(output);
 	}
 
 	ClickVoice.prototype = {
@@ -33,6 +42,13 @@
 		 * @param {number} time Time to delay action.
 		 */
 		noteOn: function (pitch, velocity, time) {
+			if(pitch < 64) {
+	    		this._filter.type = WX.findValueByKey(WX.FILTER_TYPES, 'LP');
+	    		this._filter.frequency.value = 100 + (Math.random() * 10000);
+			} else {
+				this._filter.type = WX.findValueByKey(WX.FILTER_TYPES, 'HP');
+	   			this._filter.frequency.value = 100 + (Math.random() * 10000);
+			}
 			this._src.start(time);
 		},
 

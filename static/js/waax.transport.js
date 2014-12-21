@@ -287,6 +287,19 @@
 					time: start
 				});
 			}
+		}, 
+
+		/**
+		 * Stop all playing sounds on all instruments immediately.
+		 * Use this as a MIDI Panic function.
+		 */
+		sendAllNotesOffImmediately: function() {
+	 		for (var i = 0; i < this.targets.length; i++) {
+	 			this.targets[i].onData(WH.MidiStatus.CONTROL_CHANGE, {
+	 				data1: WH.MidiController.ALL_NOTES_OFF, 
+	 				data2: 0, 
+	 				time: 0});
+			}
 		},
 
 		/**
@@ -325,6 +338,7 @@
 		pause: function () {
 			this.isRunning = false;
 			this.flushPlaybackQ();
+			this.sendAllNotesOffImmediately();
 		},
 
 		/** 

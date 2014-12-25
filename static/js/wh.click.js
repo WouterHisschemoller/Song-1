@@ -2,8 +2,16 @@
  * Click generates a short percussive click sound.
  * 
  * MIDI pitch sets filter type and frequency:
- * Values 0 to 63 set lowpass from 40 to 1000 Hz.
- * Values 64 to 127 set highpass from 100 to 10000 Hz.
+ * Values 0 to 63 set lowpass from 200 to 1000 Hz.
+ * Values 64 to 127 set highpass from 100 to 5000 Hz.
+ *
+ * To translate those values to frequency use WX.mtof().
+ * For lowpass the closest MIDI pitches 55 to 83, or 196.0 to 987.8 Hz.
+ * For highpass the closest MIDI pitches 44 to 123, or 103.8 to 9956.1 Hz.
+ *
+ * So the pitch numbers must be translated.
+ * For lowpass it's 55 + ((83 - 55) * (pitch - 0) / (63 - 0))).
+ * For highpass it's 44 + ((123 - 44) * ((pitch - 64) / (127 - 64))).
  *
  * MIDI velocity sets volume.
  * 
@@ -14,6 +22,15 @@
 (function (WX, WH) {
 
 	'use strict';
+
+	var lpFromMin = 0;
+	var lpFromMax = 63;
+	var lpToMin = 55; // 196.0 Hz
+	var lpToMax = 83; // 987.8 Hz
+	var hpFromMin = 64;
+	var hpFromMax = 127;
+	var hpToMin = 44; // 103.8 Hz
+	var hpToMax = 123; // 9956.1 Hz
 
 	/**
 	 * ClickVoice is a single voice used by the Click generator defined below.
@@ -28,7 +45,7 @@
 	    this._src = WX.Source();
 	    this._src.buffer = buffer;
 	    this._filter = WX.Filter();
-	    this._filter.Q.value = 10; // 0.0001 to 1000, default 1
+	    this._filter.Q.value = 10;
 	    this._gain = WX.Gain();
 	    this._gain.gain.value = 1.0;
 	    this._src.to(this._filter).to(this._gain).to(output);
@@ -42,13 +59,15 @@
 		 * @param {number} time Time to delay action.
 		 */
 		noteOn: function (pitch, velocity, time) {
-			if(pitch < 64) {
+			if(pitch <= lpFromMax) {
+				pitch = lpToMin + ((lpToMax - lpToMin) * (pitch - lpFromMin) / (lpFromMax - lpFromMin));
 	    		this._filter.type = WX.findValueByKey(WX.FILTER_TYPES, 'LP');
-	    		this._filter.frequency.value = 100 + (Math.random() * 10000);
 			} else {
+				pitch = hpToMin + ((hpToMax - hpToMin) * (pitch - hpFromMin) / (hpFromMax - hpFromMin));
 				this._filter.type = WX.findValueByKey(WX.FILTER_TYPES, 'HP');
-	   			this._filter.frequency.value = 100 + (Math.random() * 10000);
 			}
+	    	this._filter.frequency.value = WX.mtof(pitch);
+	    	this._gain.gain.value = velocity / 127;
 			this._src.start(time);
 		},
 

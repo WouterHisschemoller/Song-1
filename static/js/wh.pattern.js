@@ -101,15 +101,29 @@
 				if (event) {
 					if (localStart <= event.tick && event.tick <= localEnd) {
 						// add new event with time relative to time span
-						playbackQ.push(WH.MidiEvent((event.tick - localStart), event.message));
+						this.addEventToQueue(WH.MidiEvent((event.tick - localStart), event.message), playbackQ);
 					}
 					if(secondEnd && secondStart <= event.tick && event.tick <= secondEnd) {
 						// add new event with time relative to time span
-						playbackQ.push(WH.MidiEvent((event.tick - secondStart), event.message));
+						this.addEventToQueue(WH.MidiEvent((event.tick - secondStart), event.message), playbackQ);
 					}
 				}
 			}
 		},
+
+		/**
+		 * Add an event to the playback queue.
+		 * @param {WH.MidiEvent} event The MIDI event to play.
+		 * @param {Array} playbackQ Events that happen within the time range.
+		 */
+		addEventToQueue: function(event, playbackQ) {
+			// note-off events to the start of the queue so they're handled first.
+			if(event.message.type == WH.MidiStatus.NOTE_OFF) {
+				playbackQ.unshift(event);
+			} else {
+				playbackQ.push(event);
+			}
+		}
 	};
 
 	/** 

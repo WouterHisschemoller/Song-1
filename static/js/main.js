@@ -15,10 +15,10 @@ $(function() {
 		var click = WX.Click();
 		click.to(WX.Master);
 
-		var simpleNoise = WX.SimpleNoise();
-		simpleNoise.setId('simpleNoise');
-		simpleNoise.to(WX.Master);
-		simpleNoise.setView(view);
+		var noise = WX.Noise();
+		noise.setId('noise');
+		noise.to(WX.Master);
+		noise.setView(view);
 
 		var filterNoise = WX.FilterNoise();
 		filterNoise.setId('filterNoise');
@@ -28,7 +28,7 @@ $(function() {
 		// Initialize Transport with song settings.
 		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);
 		WX.Transport.addSong(song);
-		WX.Transport.addTarget(0, simpleNoise);
+		WX.Transport.addTarget(0, noise);
 		WX.Transport.addTarget(1, filterNoise);
 		WX.Transport.addTarget(2, click);
 		WX.Transport.start();

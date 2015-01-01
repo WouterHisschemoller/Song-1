@@ -1,8 +1,8 @@
 /**
- * SimpleNoise generates noise and is triggered by MIDI style events.
+ * Noise generates noise and is triggered by MIDI style events.
  * It doesn't use pitch information.
  * 
- * @wapl SimpleNoise
+ * @wapl Noise
  * @author Wouter Hisschemöller
  * @version 0.1
  */
@@ -11,12 +11,10 @@
 	'use strict';
 
 	/**
-	 * REQUIRED: plug-in constructor
 	 * @constructor
 	 */
-	function SimpleNoise(id, view, preset) {
+	function Noise(id, view, preset) {
 
-	    // REQUIRED: adding necessary modules
 	    WX.PlugIn.defineType(this, 'Generator');
 
 	    this._bufferGaus = this.createGaussian(9.73);
@@ -31,13 +29,10 @@
 	    this._noise.start(0);
 	}
 
-	/** 
-	 * REQUIRED: plug-in prototype
-	 */
- 	SimpleNoise.prototype = {
- 		// REQUIRED: plug-in info
+ 	Noise.prototype = {
+ 		
 		info: {
-			name: 'SimpleNoise',
+			name: 'Noise',
 			version: '0.0.1',
 			api_version: '1.0.0-alpha',
 			author: 'Wouter Hisschemöller',
@@ -45,7 +40,6 @@
 			description: 'Noise source'
 		},
 
-		// REQUIRED: plug-in default preset
 		defaultPreset: {
 			oscType: 'Noise'
 		},
@@ -62,8 +56,8 @@
 		 * Pre-generation of gaussian white noise.
 		 * @see http://www.musicdsp.org/showone.php?id=113
 		 * 
-		 * @param {number} duration - Duration of noise in seconds.
-		 * @return {AudioNode} - WA Buffer object.
+		 * @param {number} duration Duration of noise in seconds.
+		 * @return {AudioNode} WA Buffer object.
 		 * @see http://www.w3.org/TR/webaudio/#Buffer
 		 */
 		createGaussian: function (duration) {
@@ -81,10 +75,9 @@
 
 		/**
 		 * Start generating sound.
-		 * 
-		 * @param {number} pitch - MIDI pitch.
-		 * @param {number} velocity - MIDI velocity.
-		 * @param {number} time - time to delay action.
+		 * @param {Number} pitch MIDI pitch.
+		 * @param {Number} velocity MIDI velocity.
+		 * @param {Number} time Time to delay action.
 		 */
 		noteOn: function (pitch, velocity, time) {
 			time = (time || WX.now);
@@ -93,8 +86,7 @@
 
 		/**
 		 * Stop generating sound.
-		 * 
-		 * @param {number} time Time to delay action.
+		 * @param {Number} time Time to delay action.
 		 */
 		noteOff: function (time) {
 			time = (time || WX.now);
@@ -103,9 +95,8 @@
 
 		/**
 		 * Receive timed data from WX.Transport.
-		 * 
 		 * @param {string} action Type of event received.
-		 * @param {Object} data Properties data1 {number}, data2 {number}, time {number}.
+		 * @param {Object} data Properties data1 {Number}, data2 {Number}, time {Number}.
 		 */
 		onData: function (action, data) {
 			switch (action) {
@@ -130,10 +121,8 @@
 		}
  	};
 
-	// REQUIRED: extending plug-in prototype with modules
-	WX.PlugIn.extendPrototype(SimpleNoise, 'Generator');
-
-	// REQUIRED: registering plug-in into WX ecosystem
-	WX.PlugIn.register(SimpleNoise);
+	WX.PlugIn.extendPrototype(Noise, 'Generator');
+	
+	WX.PlugIn.register(Noise);
 
 })(WX, WH);

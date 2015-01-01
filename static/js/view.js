@@ -19,7 +19,7 @@ function View(canvasId) {
  */
 View.prototype.onData = function (action, data, generatorId) {
 	switch (generatorId) {
-		case 'simpleNoise': 
+		case 'noise': 
 			switch (action) {
 				case WH.MidiStatus.NOTE_ON:
 					// use data2 (velocity) for lightness.

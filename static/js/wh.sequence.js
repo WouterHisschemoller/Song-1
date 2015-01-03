@@ -35,17 +35,18 @@
 
 		/**
 		 * Scan events within time range.
+		 * @param {Number} absoluteStart Absolute start tick in Transport playback time.
 		 * @param {Number} start Start tick of time range.
 		 * @param {Number} end End tick of time range.
 		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
-		scanEvents: function (start, end, playbackQ) {
+		scanEvents: function (absoluteStart, start, end, playbackQ) {
 			// convert song time to sequence time
 			var localStart = start - this.startTick;
 			var localEnd = end - this.startTick;
 			// scan for events
 			for (var i = 0; i < this.patterns.length; i++) {
-				var events = this.patterns[i].scanEventsInTimeSpan(localStart, localEnd, playbackQ);
+				var events = this.patterns[i].scanEventsInTimeSpan(absoluteStart, localStart, localEnd, playbackQ);
 			}
 		}, 
 

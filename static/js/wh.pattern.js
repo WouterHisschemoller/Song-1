@@ -77,11 +77,12 @@
 		 * Find events to be played within a time span
 		 * If the pattern is shorter than the sequence, the pattern will loop.
 		 * 
+		 * @param {Number} absoluteStart Absolute start tick in Transport playback time.
 		 * @param {Number} start Start time in ticks.
 		 * @param {Number} end End time in ticks.
 		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
-		scanEventsInTimeSpan: function (start, end, playbackQ) {
+		scanEventsInTimeSpan: function (absoluteStart, start, end, playbackQ) {
 
 			// convert sequence time to pattern time
 			var localStart = start % this.length;
@@ -101,11 +102,11 @@
 				if (event) {
 					if (localStart <= event.tick && event.tick <= localEnd) {
 						// add new event with time relative to time span
-						this.addEventToQueue(WH.MidiEvent((event.tick - localStart), event.message), playbackQ);
+						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.tick - localStart)), event.message), playbackQ);
 					}
 					if(secondEnd && secondStart <= event.tick && event.tick <= secondEnd) {
 						// add new event with time relative to time span
-						this.addEventToQueue(WH.MidiEvent((event.tick - secondStart), event.message), playbackQ);
+						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.tick - secondStart)), event.message), playbackQ);
 					}
 				}
 			}

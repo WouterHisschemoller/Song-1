@@ -59,7 +59,7 @@
 			
 			// scan patterns in current sequence for events
 			if(this.sequenceIndex >= 0 && this.sequenceIndex < this.sequences.length) {
-				var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd, playbackQ);
+				var events = this.sequences[this.sequenceIndex].scanEvents(start, localStart, localEnd, playbackQ);
 			}
 
 			// test if sequences change
@@ -68,7 +68,7 @@
 				var startTick = this.sequences[i].startTick;
 				if (localStart <= startTick && startTick <= localEnd) {
 					// add all-notes-off-on-every-channel event at end of sequence
-					this.addScannedSongEvent(startTick - localStart);
+					this.addScannedSongEvent(start + (startTick - localStart));
 					// next sequence index
 					this.sequenceIndex++;
 				}
@@ -77,7 +77,7 @@
 			// test if song ends
 			if (localStart <= this.songLength && this.songLength <= localEnd) {
 				// add all-notes-off-on-every-channel event at end of sequence
-				this.addScannedSongEvent(this.songLength - localStart);
+				this.addScannedSongEvent(start + (this.songLength - localStart));
 				// update scan range for restart of song
 				localStart -= this.songLength;
 				localEnd -= this.songLength;
@@ -88,7 +88,7 @@
 			if(this.songEvents.length) {
 				// scan patterns in current sequence for events
 				if(this.sequenceIndex >= 0 && this.sequenceIndex < this.sequences.length) {
-					var events = this.sequences[this.sequenceIndex].scanEvents(localStart, localEnd, playbackQ);
+					var events = this.sequences[this.sequenceIndex].scanEvents(start, localStart, localEnd, playbackQ);
 				}
 			}
 		}, 

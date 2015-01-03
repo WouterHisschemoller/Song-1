@@ -37,9 +37,10 @@
 				var sequenceData = WH.findElement(data.sequences, 'id', sequenceId);
 				if(sequenceData) {
 					// create sequence
-					var sequence = WH.Sequence(sequenceData, data.patterns, songPosition);
+					var sequenceLength = sequenceData.length * data.song.ticksPerBeat;
+					var sequence = WH.Sequence(sequenceData, data.patterns, songPosition, sequenceLength);
 					this.sequences.push(sequence);
-					songPosition += sequenceData.length * data.song.ticksPerBeat;
+					songPosition += sequenceLength;
 					this.songLength = songPosition;
 				}
 			}

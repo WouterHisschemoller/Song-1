@@ -5,10 +5,12 @@
 	 * @param {Object} sequenceData Sequence data object.
 	 * @param {Array} patternData Array of pattern data objects.
 	 * @param {Number} startTick Sequence start tick in song arrangement.
+	 * @param {Number} lengthInTicks Sequence length measured in ticks.
 	 */
-	function Sequence(sequenceData, patternData, startTick) {
+	function Sequence(sequenceData, patternData, startTick, lengthInTicks) {
 		this.patterns = [];
 		this.startTick = startTick;
+		this.lengthInTicks = lengthInTicks;
 		if(sequenceData && patternData) {
 			this.initFromData(sequenceData, patternData);
 		}
@@ -43,7 +45,9 @@
 		scanEvents: function (absoluteStart, start, end, playbackQ) {
 			// convert song time to sequence time
 			var localStart = start - this.startTick;
-			var localEnd = end - this.startTick;
+			// localEnd should never be more than the length of the sequence
+			// to avoid double notes when a sequence and pattern restart coincide
+			var localEnd = Math.min(end - this.startTick, this.lengthInTicks);
 			// scan for events
 			for (var i = 0; i < this.patterns.length; i++) {
 				var events = this.patterns[i].scanEventsInTimeSpan(absoluteStart, localStart, localEnd, playbackQ);
@@ -62,8 +66,8 @@
 	/** 
 	 * Exports
 	 */
-	WH.Sequence = function (sequenceData, patternData, startTick) {
-		return new Sequence(sequenceData, patternData, startTick);
+	WH.Sequence = function (sequenceData, patternData, startTick, lengthInTicks) {
+		return new Sequence(sequenceData, patternData, startTick, lengthInTicks);
 	};
 
 })(WH);

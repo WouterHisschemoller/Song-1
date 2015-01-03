@@ -17,7 +17,8 @@
 	function ChordVoice(output) {
 		this._osc = WX.OSC();
 	    this._gain = WX.Gain();
-	    this._osc.to(this._gain).to(output);
+	    this._pan = WX.Panner();
+	    this._osc.to(this._gain).to(this._pan).to(output);
 	}
 
 	ChordVoice.prototype = {
@@ -30,6 +31,9 @@
 		noteOn: function (pitch, velocity, time) {
       		this._osc.frequency.set(WX.mtof(pitch), time, 0);
       		this._gain.gain.set(velocity / 127, time, 0);
+      		// pan between -0.6 and 0.6 depending on pitch value
+			var pan = -0.6 + (((pitch % 4) / 4) * 1.2);
+      		this._pan.setPosition(pan, 0, 1 - Math.abs(pan));
 			this._osc.start(time);
 		},
 
@@ -52,7 +56,8 @@
 
 	    // filter
 	    this._filter = WX.Filter();
-	    this._filter.Q.value = 5;
+	    //this._pan = WX.Panner();
+	    //this._pan.panningModel = 'equalpower';
 	    this._filter.to(this._output);
 
 	    // chord start detection
@@ -81,13 +86,15 @@
 		},
 
 		/**
-		 * Called once when a new chord starts.
-		 * Apply the filter envelope.
+		 * Called once when a new chord starts, 
+		 * so the filter envelope can be started.
 		 * @param {Number} time Time to delay action.
 		 */
 		onChordStart: function(time) {
-      		this._filter.frequency.set(800, time, 0);
-      		this._filter.frequency.set(50, time + WX.Transport.tick2sec(240), 1);
+	    	this._filter.Q.set(3 + (Math.random() * 4), time, 0);
+      		this._filter.frequency.set(600 + (Math.random() * 400), time, 0);
+      		this._filter.frequency.set(50, 
+      			time + WX.Transport.tick2sec(200 + Math.round(Math.random() * 100)), 1);
 		}, 
 
 		/**
@@ -108,9 +115,7 @@
 			if(time != this.time) {
 				this.time = time;
 				this.onChordStart(time);
-				console.log('chord start');
 			}
-			console.log(pitch, time);
 		},
 
 		/**

@@ -48,7 +48,8 @@
 	    this._filter.Q.value = 10;
 	    this._gain = WX.Gain();
 	    this._gain.gain.value = 1.0;
-	    this._src.to(this._filter).to(this._gain).to(output);
+	    this._pan = WX.Panner();
+	    this._src.to(this._filter).to(this._gain).to(this._pan).to(output);
 	}
 
 	ClickVoice.prototype = {
@@ -68,6 +69,9 @@
 			}
 	    	this._filter.frequency.value = WX.mtof(pitch);
 	    	this._gain.gain.value = velocity / 127;
+      		// pan between -0.6 and 0.6 depending on pitch value
+			var pan = -0.4 + (((pitch % 4) / 4) * 0.8);
+      		this._pan.setPosition(pan, 0, 1 - Math.abs(pan));
 			this._src.start(time);
 		},
 

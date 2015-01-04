@@ -132,7 +132,20 @@
 				this.numVoices--;
 			}
 			this.voices[pitch] = [];
-		},
+		}, 
+
+		allNotesOff: function(time) {
+			for(var i = 0; i < this.voices.length; i++) {
+				var playing = this.voices[i];
+				if(playing.length) {
+					for (var j = 0; j < playing.length; j++) {
+						playing[j].noteOff(i, 0, time);
+						this.numVoices--;
+					}
+					this.voices[i] = [];
+				}
+			}
+		}, 
 
 		/**
 		 * Receive timed data from WX.Transport.
@@ -150,7 +163,7 @@
 				case WH.MidiStatus.CONTROL_CHANGE:
 					switch(data.data1) {
 						case WH.MidiController.ALL_NOTES_OFF: 
-							this.noteOff(data.data1, data.data2, data.time);
+							this.allNotesOff(data.time);
 							break;
 					}
 					break;

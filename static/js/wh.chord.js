@@ -15,6 +15,8 @@
 	 * @constructor
 	 */
 	function ChordVoice(output) {
+		// 50ms release to avoid clicks
+		this.release = 0.05;
 		this._osc = WX.OSC();
 	    this._gain = WX.Gain();
 	    this._pan = WX.Panner();
@@ -44,7 +46,9 @@
 		 * @param {Number} time Time to delay action.
 		 */
 		noteOff: function (pitch, velocity, time) {
-			this._osc.stop(time);
+			// short release to avoid clicks
+			this._gain.gain.set(0, time + this.release, 1);
+			this._osc.stop(time + this.release);
 		}
 	};
 

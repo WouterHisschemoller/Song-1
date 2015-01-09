@@ -279,8 +279,8 @@
 		 */
 		sendData: function () {
 			for (var i = 0; i < this.playbackQ.length; i++) {
-				var event = this.playbackQ[i], 
-				start = this.absOrigin + this.tick2sec(this.now + event.tick);
+				var event = this.playbackQ[i];
+				var start = this.absOrigin + this.tick2sec(this.now + event.tick);
 				this.targets[event.message.channel].onData(event.message.type, {
 					data1: event.message.data1,
 					data2: event.message.data2,

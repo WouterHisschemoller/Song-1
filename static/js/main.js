@@ -2,7 +2,8 @@
 $(function() {
 
 	/**
-	 * 
+	 * JSON song arrangement data loaded.
+	 * @param {JSON} data JSON data containing the song arrangement.
 	 */
 	this.onDataLoaded = function(data) {
 		var view = new View('canvas');

@@ -24,6 +24,7 @@
 	}
 
 	ChordVoice.prototype = {
+		
 		/**
 		 * Start generating sound.
 		 * @param {number} pitch MIDI pitch.

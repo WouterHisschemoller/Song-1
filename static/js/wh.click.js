@@ -39,7 +39,6 @@
 	 * @constructor
 	 * @param {Click} generator Click generator that plays these voices.
 	 * @param {AudioBuffer} buffer AudioBuffer containing the click sample.
-	 * @param {[type]} [varname] [description]
 	 */
 	function ClickVoice(output, buffer) {
 	    this._src = WX.Source();

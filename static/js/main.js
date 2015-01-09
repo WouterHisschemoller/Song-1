@@ -28,6 +28,9 @@ $(function() {
 		var chord = WX.Chord();
 		chord.to(WX.Master);
 
+		var kick = WX.Kick();
+		kick.to(WX.Master);
+
 		// Initialize Transport with song settings.
 		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);
 		WX.Transport.addSong(song);
@@ -35,6 +38,7 @@ $(function() {
 		WX.Transport.addTarget(1, filterNoise);
 		WX.Transport.addTarget(2, click);
 		WX.Transport.addTarget(3, chord);
+		WX.Transport.addTarget(4, kick);
 		WX.Transport.start();
 	}
 

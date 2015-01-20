@@ -30,7 +30,9 @@ $(function() {
 		chord.to(WX.Master);
 
 		var kick = WX.Kick();
-		kick.to(WX.Master);
+		var wave = WX.Wave();
+		wave.init('wavedisplay', 1);
+		kick.to(wave).to(WX.Master);
 
 		// Initialize Transport with song settings.
 		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);

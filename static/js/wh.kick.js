@@ -82,22 +82,22 @@
 		 */
 		createBuffer: function() {
 			// duration in seconds
-			var sampleDuration = 1;
+			var sampleDuration = 0.2;
 			// duration in samples
 			var sampleLength = Math.floor(WX.srate * sampleDuration);
 			var offlineCtx = new OfflineAudioContext(2, sampleLength, WX.srate);
 
 			var bodyFadeGain = offlineCtx.createGain();
-			//bodyFadeGain.gain.setValueAtTime(1, offlineCtx.currentTime + 0);
-			bodyFadeGain.gain.setValueAtTime(0, offlineCtx.currentTime + 0.2);
+			bodyFadeGain.gain.setValueAtTime(1, offlineCtx.currentTime);
+			bodyFadeGain.gain.exponentialRampToValueAtTime(0.001, offlineCtx.currentTime + 0.2);
 			bodyFadeGain.connect(offlineCtx.destination);
 
 			var bodyOsc = offlineCtx.createOscillator();
 			bodyOsc.frequency.setValueAtTime(880, offlineCtx.currentTime);
 			bodyOsc.frequency.exponentialRampToValueAtTime(44, offlineCtx.currentTime + 0.03);
 			bodyOsc.connect(bodyFadeGain);
+			
 			bodyOsc.start(offlineCtx.currentTime);
-
 			offlineCtx.startRendering();
 			offlineCtx.oncomplete = function(e) {
 				this.buffer = e.renderedBuffer;

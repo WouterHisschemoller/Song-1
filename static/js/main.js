@@ -42,7 +42,20 @@ $(function() {
 		WX.Transport.addTarget(2, click);
 		WX.Transport.addTarget(3, chord);
 		WX.Transport.addTarget(4, kick);
-		WX.Transport.start();
+		
+		setTimeout(function() {
+			WX.Transport.start();
+		}, 200);
+
+		$(document).on('keyup', function(e) {
+			if(e.keyCode == 32) {
+				if(WX.Transport.isRunning) {
+					WX.Transport.pause();
+				} else {
+					WX.Transport.start();
+				}
+			}
+		}.bind(this));
 	}
 
 	$.getJSON('static/json/song.json', this.onDataLoaded.bind(this));

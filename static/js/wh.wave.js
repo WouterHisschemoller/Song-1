@@ -57,6 +57,7 @@
 
 			// script processor node to handle incoming audio
 			this.processor = WX._ctx.createScriptProcessor(4096, 2, 2);
+			console.log('WAVE ScriptProcessorNode created.');
 			// capture the waveform
 			this.processor.onaudioprocess = this.onAudioProcess.bind(this);
 			// pipe the incoming audio to the processor, nd on to the output

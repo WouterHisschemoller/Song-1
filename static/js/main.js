@@ -31,8 +31,8 @@ $(function() {
 
 		var kick = WX.Kick();
 		var wave = WX.Wave();
-		wave.init('wavedisplay', 1);
-		kick.to(wave).to(WX.Master);
+		wave.init('wavedisplay', 2);
+		kick.to(WX.Master);
 
 		// Initialize Transport with song settings.
 		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);
@@ -42,7 +42,8 @@ $(function() {
 		WX.Transport.addTarget(2, click);
 		WX.Transport.addTarget(3, chord);
 		WX.Transport.addTarget(4, kick);
-		
+
+		// short start delay to allow the app to initialize
 		setTimeout(function() {
 			WX.Transport.start();
 		}, 200);

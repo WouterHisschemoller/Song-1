@@ -82,26 +82,69 @@
 		 */
 		createBuffer: function() {
 			// duration in seconds
-			var sampleDuration = 0.2;
+			var sampleDuration = 0.4;
 			// duration in samples
 			var sampleLength = Math.floor(WX.srate * sampleDuration);
 			var offlineCtx = new OfflineAudioContext(2, sampleLength, WX.srate);
 
 			var bodyFadeGain = offlineCtx.createGain();
 			bodyFadeGain.gain.setValueAtTime(1, offlineCtx.currentTime);
-			bodyFadeGain.gain.exponentialRampToValueAtTime(0.001, offlineCtx.currentTime + 0.2);
+			bodyFadeGain.gain.exponentialRampToValueAtTime(0.001, offlineCtx.currentTime + sampleDuration);
 			bodyFadeGain.connect(offlineCtx.destination);
 
 			var bodyOsc = offlineCtx.createOscillator();
-			bodyOsc.frequency.setValueAtTime(880, offlineCtx.currentTime);
+			bodyOsc.frequency.setValueAtTime(660, offlineCtx.currentTime);
 			bodyOsc.frequency.exponentialRampToValueAtTime(44, offlineCtx.currentTime + 0.03);
 			bodyOsc.connect(bodyFadeGain);
+
+			var clickFadeGain = offlineCtx.createGain();
+			clickFadeGain.gain.setValueAtTime(0.4, offlineCtx.currentTime);
+			clickFadeGain.gain.exponentialRampToValueAtTime(0.00001, offlineCtx.currentTime + 0.001);
+			clickFadeGain.connect(offlineCtx.destination);
+
+			var clickOsc = offlineCtx.createOscillator();
+			clickOsc.frequency.setValueAtTime(8000, offlineCtx.currentTime);
+			clickOsc.frequency.exponentialRampToValueAtTime(2000, offlineCtx.currentTime + 0.001);
+			clickOsc.connect(clickFadeGain);
+
+			var noiseFadeGain = offlineCtx.createGain();
+			noiseFadeGain.gain.setValueAtTime(0.005, offlineCtx.currentTime);
+			noiseFadeGain.gain.exponentialRampToValueAtTime(0.0001, offlineCtx.currentTime + 0.1);
+			noiseFadeGain.connect(offlineCtx.destination);
+
+			var noise = offlineCtx.createBufferSource();
+		    noise.buffer = this.createGaussian(0.4);
+			noise.connect(noiseFadeGain);
 			
 			bodyOsc.start(offlineCtx.currentTime);
+			clickOsc.start(offlineCtx.currentTime);
+			noise.start(offlineCtx.currentTime);
+
 			offlineCtx.startRendering();
 			offlineCtx.oncomplete = function(e) {
 				this.buffer = e.renderedBuffer;
 			}.bind(this);
+		}, 
+
+		/**
+		 * Pre-generation of gaussian white noise.
+		 * @see http://www.musicdsp.org/showone.php?id=113
+		 * 
+		 * @param {number} duration Duration of noise in seconds.
+		 * @return {AudioNode} WA Buffer object.
+		 * @see http://www.w3.org/TR/webaudio/#Buffer
+		 */
+		createGaussian: function (duration) {
+			var length = Math.floor(WX.srate * duration);
+			var noiseFloat32 = new Float32Array(length);
+			for (var i = 0; i < length; i++) {
+				var r1 = Math.log(Math.random()), r2 = Math.PI * Math.random();
+				noiseFloat32[i] = Math.sqrt(-2.0 * r1) * Math.cos(2.0 * r2) * 0.5;
+			}
+			var noiseBuffer = WX.Buffer(2, length, WX.srate);
+			noiseBuffer.getChannelData(0).set(noiseFloat32, 0);
+			noiseBuffer.getChannelData(1).set(noiseFloat32, 0);
+			return noiseBuffer;
 		}, 
 
 		/**

@@ -160,7 +160,7 @@
 		/**
 		 * Receive timed data from WX.Transport.
 		 * @param {string} action Type of event received.
-		 * @param {Object} data Properties data1 {number}, data2 {number}, time {number}.
+		 * @param {Object} data Properties data1 {Number}, data2 {Number}, time {Number}.
 		 */
 		onData: function (action, data) {
 			switch (action) {

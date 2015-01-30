@@ -98,8 +98,8 @@
 		onChordStart: function(time) {
 	    	this._filter.Q.set(3 + (Math.random() * 4), time, 0);
       		this._filter.frequency.set(600 + (Math.random() * 400), time, 0);
-      		this._filter.frequency.set(50, 
-      			time + WX.Transport.tick2sec(200 + Math.round(Math.random() * 100)), 1);
+      		//this._filter.frequency.set(50, 
+      		//	time + WH.Transport.tick2sec(200 + Math.round(Math.random() * 100)), 1);
 		}, 
 
 		/**

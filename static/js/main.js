@@ -34,26 +34,26 @@ $(function() {
 		wave.init('wavedisplay', 2);
 		kick.to(WX.Master);
 
-		// Initialize Transport with song settings.
-		WX.Transport.init(data.song.ticksPerBeat, data.song.beatsPerMinute);
-		WX.Transport.addSong(song);
-		WX.Transport.addTarget(0, noise);
-		WX.Transport.addTarget(1, filterNoise);
-		WX.Transport.addTarget(2, click);
-		WX.Transport.addTarget(3, chord);
-		WX.Transport.addTarget(4, kick);
+		var transport = WH.Transport();
+		transport.setSong(song);
+		transport.addTarget(0, noise);
+		transport.addTarget(1, filterNoise);
+		transport.addTarget(2, click);
+		transport.addTarget(3, chord);
+		transport.addTarget(4, kick);
 
 		// short start delay to allow the app to initialize
 		setTimeout(function() {
-			WX.Transport.start();
+			transport.start();
 		}, 200);
 
+		// pause / play by pressing space bar
 		$(document).on('keyup', function(e) {
 			if(e.keyCode == 32) {
-				if(WX.Transport.isRunning) {
-					WX.Transport.pause();
+				if(transport.isRunning) {
+					transport.pause();
 				} else {
-					WX.Transport.start();
+					transport.start();
 				}
 			}
 		}.bind(this));

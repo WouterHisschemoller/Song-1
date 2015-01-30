@@ -1,23 +1,20 @@
-(function(WX) {
+(function(WX, WH) {
 
 	/**
 	 * @constructor
 	 */
-	function Transport(BPM) {
-		this.BPM = BPM || 120;
-		this.oldBPM = BPM;
+	function Transport(song) {
 
-		this.TICKS_PER_BEAT = 480;
-
-		// beats, ticks in seconds
-		this.BIS = 0.0;
-		this.TIS = 0.0;
+		// pulses per quarter note
+		this.PPQN = 480;
+		// seconds per pulse
+		this.SPP = 0.0;
 
 		// NOTES:
 		// - absolute time: time expressed in audioContext time
 		// - sec: linear time in seconds
-		// - tick: musical time, minimum unit of MBT timebase (varies on BPM)
-		// * if not specified in signature, it handles as tick (musical time)
+		// - pulse: musical time, minimum unit of MBT timebase (varies on BPM)
+		// * if not specified in signature, it handles as pulse (musical time)
 		// * however, all the internal calculation should be in seconds
 
 		// origin in absolute time and now reference
@@ -50,8 +47,9 @@
 		this.isRunning = false;
 		this.isLoop = false;
 
-		// init BPM and initiate loop
-		this.setBPM(BPM);
+		// initialise with a default empty song
+		this.setSong(song || WH.Song());
+		// initiate loop
 		this._loop();
 	}
 
@@ -60,25 +58,21 @@
 		/**
 		 * utilities
 		 */
-
-		tick2sec: function (tick) {
-			return tick * this.TIS;
+		
+		pulse2sec: function (pulse) {
+			return pulse * this.SPP;
 		},
 
-		sec2tick: function (sec) {
-			return sec / this.TIS;
+		sec2pulse: function (sec) {
+			return sec / this.SPP;
 		},
 
 		/**
 		 * setter and getter
 		 */
 
-		getAbsTimeInSec: function (tick) {
-			return this.absOrigin + this.tick2sec(tick);
-		},
-
-		getBPM: function () {
-			return this.BPM;
+		getAbsTimeInSec: function (pulse) {
+			return this.absOrigin + this.pulse2sec(pulse);
 		},
 
 		getNowInSec: function () {
@@ -86,7 +80,7 @@
 		},
 
 		getNow: function () {
-			return this.sec2tick(this.now);
+			return this.sec2pulse(this.now);
 		},
 
 		getLoopDurationInSec: function() {
@@ -94,41 +88,18 @@
 		},
 
 		getLoopDuration: function() {
-			return this.sec2tick(this.getLoopDurationInSec());
-		}, 
-
-		/**
-		 * Initialize the Transport.
-		 * @param {Number} tpb Ticks Per Beat.
-		 * @param {Number} bpm Beats Per Minute.
-		 */
-		init: function(tpb, bpm) {
-			this.TICKS_PER_BEAT = tpb;
-			this.setBPM(bpm);
-		}, 
-
-		/**
-		 * Set the sequencer note placement precision in Ticks Per Beat.
-		 * @param {Number} tpb Ticks Per Beat.
-		 */
-		setTicksPerBeat: function(TPB) {
-			this.TICKS_PER_BEAT = TPB;
-			this.setBPM(this.BPM);
+			return this.sec2pulse(this.getLoopDurationInSec());
 		}, 
 
 		/**
 		 * Set the tempo in beats per second.
-		 * @param {Number} BPM Beats Per Second.
 		 */
-		setBPM: function (BPM) {
-			this.BPM = BPM;
-			var factor = this.oldBPM / this.BPM;
-			this.oldBPM = this.BPM;
-			// recalcualte beat in seconds, tick in seconds
-			this.BIS = 60.0 / this.BPM;
-			this.TIS = this.BIS / this.TICKS_PER_BEAT;
-			// lookahead is 32 ticks (1/64th note)
-			this.lookahead = this.TIS * 16;
+		setTempoChange: function (bpm, factor) {
+			// recalculate pulse in seconds
+			var beatInSeconds = 60.0 / bpm;
+			this.SPP = beatInSeconds / this.PPQN;
+			// lookahead is 32 pulse (1/64th note)
+			this.lookahead = this.SPP * 16;
 			// update time references based on tempo change
 			this.now *= factor;
 			this.loopStart *= factor;
@@ -144,28 +115,28 @@
 			// update now and absolute origin
 			this.now = sec;
 			this.absOrigin = WX.now - this.now;
-			// get tick of current linear now
-			var tick = this.sec2tick(this.now);
+			// get pulse of current linear now
+			var pulse = this.sec2pulse(this.now);
 		},
 
 		/**
-		 * Move the playhead to the position in ticks.
-		 * @param {Number} tick The new playback position in ticks.
+		 * Move the playhead to the position in pulses.
+		 * @param {Number} pulse The new playback position in pulses.
 		 */
-		setNow: function (tick) {
-			this.setNowInSec(this.tick2sec(tick));
+		setNow: function (pulse) {
+			this.setNowInSec(this.pulse2sec(pulse));
 		},
 
 		/**
 		 * Set or unset looping.
 		 * Omit one of the parameters to stop looping.
-		 * @param {Number} start Loop start position in ticks.
-		 * @param {Number} end Loop end position in ticks.
+		 * @param {Number} start Loop start position in pulses.
+		 * @param {Number} end Loop end position in pulses.
 		 */
 		setLoop: function (start, end) {
 			if(start != null && end != null) {
-				this.loopStart = this.tick2sec(start);
-				this.loopEnd = this.tick2sec(end);
+				this.loopStart = this.pulse2sec(start);
+				this.loopEnd = this.pulse2sec(end);
 				this.isLoop = true;
 			} else {
 				this.loopStart = 0.0;
@@ -228,29 +199,37 @@
 		 */ 
 		scanEvents: function () {
 			if (this.needsScan) {
-				// start and end time in ticks
-				var start = this.sec2tick(this.scanStart);
-				var end = this.sec2tick(this.scanEnd);
-				var events = this.song.scanEvents(start, end, this.playbackQ);
 				this.needsScan = false;
 
-				// if a new sequence started during this time range, 
-				// there will be song events
-				// get the events and add them to the playbackQ for all channels
-				var songEvents = this.song.getScannedSongEvents();
-				for (var i = 0; i < songEvents.length; i++) {
-					var event = songEvents[i];
-					if(event.message.type == WH.MidiStatus.CONTROL_CHANGE &&
-						event.message.data1 == WH.MidiController.ALL_SOUND_OFF) {
-				 		for (channel in this.targets) {
-							// note: put all-note-off events at start of queue so they
-							// won't stop events that start on the same tick
-				 			this.playbackQ.unshift(WH.MidiEvent(event.tick, WH.MidiMessage(
-				 				WH.MidiStatus.CONTROL_CHANGE,
-								channel,
-								WH.MidiController.ALL_NOTES_OFF,
-								0))
-							);
+				if(this.song) {
+					// get song arrangement events
+					this.song.scanEvents(this.scanStart, this.scanEnd, this.playbackQ);
+
+					// convert song time in beats to transport time in pulses
+					var bpm = this.song.getBPM();
+					for (var i = 0; i < this.playbackQ.length; i++) {
+						var midiEvent = this.playbackQ[i];
+						midiEvent.time = midiEvent.time * this.PPQN;
+					}
+
+					// if a new sequence started during this time range, 
+					// there will be song events
+					// get the events and add them to the playbackQ for all channels
+					var songEvents = this.song.getScannedSongEvents();
+					for (var i = 0; i < songEvents.length; i++) {
+						var event = songEvents[i];
+						if(event.message.type == WH.MidiStatus.CONTROL_CHANGE &&
+							event.message.data1 == WH.MidiController.ALL_SOUND_OFF) {
+					 		for (channel in this.targets) {
+								// note: put all-note-off events at start of queue so they
+								// won't stop events that start on the same pulse
+					 			this.playbackQ.unshift(WH.MidiEvent(event.time, WH.MidiMessage(
+					 				WH.MidiStatus.CONTROL_CHANGE,
+									channel,
+									WH.MidiController.ALL_NOTES_OFF,
+									0))
+								);
+							}
 						}
 					}
 				}
@@ -280,7 +259,7 @@
 		sendData: function () {
 			for (var i = 0; i < this.playbackQ.length; i++) {
 				var event = this.playbackQ[i];
-				var start = this.absOrigin + this.tick2sec(this.now + event.tick);
+				var start = this.absOrigin + this.pulse2sec(this.now + event.time);
 				this.targets[event.message.channel].onData(event.message.type, {
 					data1: event.message.data1,
 					data2: event.message.data2,
@@ -350,11 +329,16 @@
 		},
 
 		/**
-		 * 
+		 * Set the song to play.
 		 * @param {WH.Song} song Song object 
 		 */
-		addSong: function (song) {
+		setSong: function (song) {
+			// get tempo change factor if a current song is replaced
+			var factor = this.song ? (this.song.getBPM() / song.getBPM()) : 1;
+			// set song
 			this.song = song;
+			// update time references
+			this.setTempoChange(this.song.getBPM(), factor);
 		},
 
 		/**
@@ -371,7 +355,7 @@
 		updateView: function () {
 			// send data to update view and controller (polymer element)
 			for (var i = 0; i < this.views.length; i++) {
-				this.views[i].setPlayhead(this.sec2tick(this.now));
+				this.views[i].setPlayhead(this.sec2pulse(this.now));
 			}
 		},
 
@@ -383,6 +367,11 @@
 		}
 	};
 
-	WX.Transport = new Transport(120);
+	/** 
+	 * Exports
+	 */
+	WH.Transport = function () {
+		return new Transport();
+	};
 
-})(WX);
+})(WX, WH);

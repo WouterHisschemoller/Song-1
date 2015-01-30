@@ -85,6 +85,7 @@
 			var sampleDuration = 0.4;
 			// duration in samples
 			var sampleLength = Math.floor(WX.srate * sampleDuration);
+			// offline context
 			var offlineCtx = new OfflineAudioContext(2, sampleLength, WX.srate);
 
 			var bodyFadeGain = offlineCtx.createGain();

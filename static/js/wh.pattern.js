@@ -20,7 +20,7 @@
 		 */
 		initFromData: function(data) {
 
-			this.length = data.length * 480;
+			this.length = data.length;
 
 			for(var i = 0; i < data.events.length; i++) {
 
@@ -30,7 +30,7 @@
 					case 'note': 
 						// note-on
 						this.push(WH.MidiEvent(
-							Math.floor(event[1] * 480), 
+							event[1], 
 							WH.MidiMessage(
 								WH.MidiStatus.NOTE_ON, 
 								data.channel, 
@@ -38,7 +38,7 @@
 								event[4])));
 						// note-off
 						this.push(WH.MidiEvent(
-							Math.floor((event[1] + event[2]) * 480), 
+							event[1] + event[2], 
 							WH.MidiMessage(
 								WH.MidiStatus.NOTE_OFF, 
 								data.channel, 
@@ -50,7 +50,7 @@
 
 			// add end-of-track meta event
 			this.push(WH.MidiEvent(
-				Math.floor(this.length), 
+				this.length, 
 				WH.MidiMessage(
 					WH.MidiStatus.META_MESSAGE, 
 					data.channel, 
@@ -77,9 +77,9 @@
 		 * Find events to be played within a time span
 		 * If the pattern is shorter than the sequence, the pattern will loop.
 		 * 
-		 * @param {Number} absoluteStart Absolute start tick in Transport playback time.
-		 * @param {Number} start Start time in ticks.
-		 * @param {Number} end End time in ticks.
+		 * @param {Number} absoluteStart Absolute start beat in Transport playback time.
+		 * @param {Number} start Start time in beats.
+		 * @param {Number} end End time in beats.
 		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
 		scanEventsInTimeSpan: function (absoluteStart, start, end, playbackQ) {
@@ -100,13 +100,13 @@
 			for (var id in this.events) {
 				var event = this.events[id];
 				if (event) {
-					if (localStart <= event.tick && event.tick <= localEnd) {
+					if (localStart <= event.time && event.time <= localEnd) {
 						// add new event with time relative to time span
-						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.tick - localStart)), event.message), playbackQ);
+						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.time - localStart)), event.message), playbackQ);
 					}
-					if(secondEnd && secondStart <= event.tick && event.tick <= secondEnd) {
+					if(secondEnd && secondStart <= event.time && event.time <= secondEnd) {
 						// add new event with time relative to time span
-						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.tick - secondStart)), event.message), playbackQ);
+						this.addEventToQueue(WH.MidiEvent((absoluteStart + (event.time - secondStart)), event.message), playbackQ);
 					}
 				}
 			}

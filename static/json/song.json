@@ -2,7 +2,6 @@
 	"song": {
 		"id": "song1",
 		"beatsPerMinute": 120, 
-		"ticksPerBeat": 480, 
 		"sequences": [
 			"sequence_01"
 		]

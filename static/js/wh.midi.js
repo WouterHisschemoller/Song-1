@@ -14,8 +14,8 @@
 	MidiMessage.prototype = {
 	};
 
-	function MidiEvent(tick, message) {
-		this.tick = (tick || 0);
+	function MidiEvent(time, message) {
+		this.time = (time || 0);
 		this.message = (message || 0);
 	}
 
@@ -29,8 +29,8 @@
 		return new MidiMessage(type, channel, data1, data2);
 	};
 
-	WH.MidiEvent = function (tick, midiMessage) {
-		return new MidiEvent(tick, midiMessage);
+	WH.MidiEvent = function (time, midiMessage) {
+		return new MidiEvent(time, midiMessage);
 	};
 
 	/**

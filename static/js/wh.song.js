@@ -14,9 +14,14 @@
 		this.sequenceIndex = -1;
 		this.songLength = 0;
 		this.songEvents = [];
-		// initialize song structure from loaded json data
+		this.beatsPerMinute = 0;
+		this.secondsPerBeat = 0;
+		this.oldBPM = 0;
 		if(data) {
+			// initialize song structure from loaded json data
 			this.initFromData(data);
+		} else {
+			this.setBPM(120);
 		}
 	}
 
@@ -29,15 +34,16 @@
 		 */
 		initFromData: function(data) {
 
-			var songPosition = 0;
+			this.setBPM(data.song.beatsPerMinute);
 
 			// create sequences
+			var songPosition = 0;
 			for(var i = 0; i < data.song.sequences.length; i++) {
 				var sequenceId = data.song.sequences[i];
 				var sequenceData = WH.findElement(data.sequences, 'id', sequenceId);
 				if(sequenceData) {
 					// create sequence
-					var sequenceLength = sequenceData.length * data.song.ticksPerBeat;
+					var sequenceLength = sequenceData.length;
 					var sequence = WH.Sequence(sequenceData, data.patterns, songPosition, sequenceLength);
 					this.sequences.push(sequence);
 					songPosition += sequenceLength;
@@ -48,12 +54,16 @@
 
 		/**
 		 * Scan events within time range.
-		 * @param {Number} start Start tick of time range.
-		 * @param {Number} end End tick of time range.
+		 * @param {Number} start Start of time range in seconds.
+		 * @param {Number} end End of time range in seconds.
 		 * @param {Array} playbackQ Events that happen within the time range.
 		 */
 		scanEvents: function (start, end, playbackQ) {
 
+			// convert time in seconds to time in beats
+			var start = this.secToBeat(start);
+			var end = this.secToBeat(end);
+			
 			// convert transport time to song time
 			var localStart = start % this.songLength;
 			var localEnd = localStart + (end - start);
@@ -66,10 +76,10 @@
 			// test if sequences change
 			var n = this.sequences.length;
 			for(var i = 0; i < n; i++) {
-				var startTick = this.sequences[i].startTick;
-				if (localStart <= startTick && startTick <= localEnd) {
+				var startBeat = this.sequences[i].getStartBeat();
+				if (localStart <= startBeat && startBeat <= localEnd) {
 					// add all-notes-off-on-every-channel event at end of sequence
-					this.addScannedSongEvent(start + (startTick - localStart));
+					this.addScannedSongEvent(start + (startBeat - localStart));
 					// next sequence index
 					this.sequenceIndex++;
 				}
@@ -115,6 +125,35 @@
 			var events = this.songEvents;
 			this.songEvents = [];
 			return events;
+		}, 
+
+		/**
+		 * Getter for BPM.
+		 * @return {Number} Song tempo in Beats Per Minute.
+		 */
+		getBPM: function() {
+			return this.beatsPerMinute;
+		}, 
+
+		/**
+		 * Set BPM and update related variables.
+		 * @param {Number} Song tempo in Beats Per Minute.
+		 * @return {Number} Factor by which the playback speed has changed.
+		 */
+		setBPM: function(beatsPerMinute) {
+			var factor = this.beatsPerMinute / beatsPerMinute;
+			this.beatsPerMinute = beatsPerMinute;
+			this.secondsPerBeat = 60 / this.beatsPerMinute;
+			return factor;
+		}, 
+
+		/**
+		 * Convert seconds to beats.
+		 * @param  {Number} sec Number of seconds
+		 * @return {Number} Number of beats.
+		 */
+		secToBeat: function(sec) {
+			return sec / this.secondsPerBeat;
 		}
 	};
 

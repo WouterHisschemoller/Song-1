@@ -26,6 +26,13 @@
 
 				// create event from data
 				var event = data.events[i];
+
+				// convert measures, beats, 16th, 64th string to beats
+				if(typeof event[1] == 'string') {
+					event[1] = this.mbssToBeats(event[1]);
+					event[2] = this.mbssToBeats(event[2]);
+				}
+
 				switch(event[0]) {
 					case 'note': 
 						// note-on
@@ -124,6 +131,36 @@
 			} else {
 				playbackQ.push(event);
 			}
+		}, 
+
+		/**
+		 * Convert a comma separated string containing
+		 * measures, beats, sixteenth, sixtyfourth timing units
+		 * to length in beats.
+		 * @param  {String} mbssString "measures, beats, 16th, 64th" string.
+		 * @return {Number} Number of beats.
+		 */
+		mbssToBeats: function(mbssString) {
+			var beatsPerMeasure = 4;
+			var beats = 0;
+			var arr = mbssString.split(',');
+			for(var j = 0; j < arr.length; j++) {
+				switch(j) {
+					case 0:
+						beats += parseInt(arr[j]) * beatsPerMeasure;
+						break;
+					case 1: 
+						beats += parseInt(arr[j]);
+						break;
+					case 2: 
+						beats += parseInt(arr[j]) / 8;
+						break;
+					case 3: 
+						beats += parseInt(arr[j]) / 16;
+						break;
+				}
+			}
+			return beats;
 		}
 	};
 

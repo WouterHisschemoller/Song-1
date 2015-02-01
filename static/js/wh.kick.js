@@ -94,7 +94,7 @@
 			bodyFadeGain.connect(offlineCtx.destination);
 
 			var bodyOsc = offlineCtx.createOscillator();
-			bodyOsc.frequency.setValueAtTime(660, offlineCtx.currentTime);
+			bodyOsc.frequency.setValueAtTime(220, offlineCtx.currentTime);
 			bodyOsc.frequency.exponentialRampToValueAtTime(44, offlineCtx.currentTime + 0.03);
 			bodyOsc.connect(bodyFadeGain);
 

@@ -67,7 +67,7 @@
 				this._filter.type = WX.findValueByKey(WX.FILTER_TYPES, 'HP');
 			}
 	    	this._filter.frequency.value = WX.mtof(pitch);
-	    	this._gain.gain.value = velocity / 127;
+	    	this._gain.gain.value = (velocity / 127) * 0.8;
       		// pan between -0.6 and 0.6 depending on pitch value
 			var pan = -0.4 + (((pitch % 4) / 4) * 0.8);
       		this._pan.setPosition(pan, 0, 1 - Math.abs(pan));

@@ -81,7 +81,7 @@
 		 */
 		noteOn: function (pitch, velocity, time) {
 			time = (time || WX.now);
-			this._amp.gain.set((velocity / 127) / 3, [time, 0.00], 3);
+			this._amp.gain.set((velocity / 127) * 0.01, [time, 0.00], 3);
 		},
 
 		/**

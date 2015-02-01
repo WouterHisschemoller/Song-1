@@ -33,7 +33,7 @@
 		 */
 		noteOn: function (pitch, velocity, time) {
       		this._osc.frequency.set(WX.mtof(pitch), time, 0);
-      		this._gain.gain.set(velocity / 127, time, 0);
+      		this._gain.gain.set((velocity / 127) * 0.7, time, 0);
       		// pan between -0.6 and 0.6 depending on pitch value
 			var pan = -0.6 + (((pitch % 4) / 4) * 1.2);
       		this._pan.setPosition(pan, 0, 1 - Math.abs(pan));
@@ -97,9 +97,8 @@
 		 */
 		onChordStart: function(time) {
 	    	this._filter.Q.set(3 + (Math.random() * 4), time, 0);
-      		this._filter.frequency.set(600 + (Math.random() * 400), time, 0);
-      		//this._filter.frequency.set(50, 
-      		//	time + WH.Transport.tick2sec(200 + Math.round(Math.random() * 100)), 1);
+      		this._filter.frequency.set(400 + (Math.random() * 400), time, 0);
+      		this._filter.frequency.set(50, time + 0.15 + (Math.random() * 0.2), 1);
 		}, 
 
 		/**

@@ -27,7 +27,7 @@
 	    this._noise.loop = true;
 	    this._filter = WX.Filter();
 	    this._filter.type = 'bandpass';
-	    this._filter.Q.value = 60;
+	    this._filter.Q.value = 80;
 	    this._filter.gain.value = 40;
 		this._amp = WX.Gain();
 		this._amp.gain.value = 0.0;
@@ -92,8 +92,8 @@
 		 */
 		noteOn: function (pitch, velocity, time) {
 			time = (time || WX.now);
-			this._amp.gain.set((velocity / 127) + 3, [time, 0.00], 3);
-			this._filter.frequency.value = 500 + (pitch * 5);
+			this._amp.gain.set((velocity / 127) + 1, [time, 0.00], 3);
+			this._filter.frequency.value = WX.mtof(pitch);
 		},
 
 		/**

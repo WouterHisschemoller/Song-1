@@ -10,6 +10,9 @@ $(function() {
 
 		var song = WH.Song(data);
 
+		// var wave = WX.Wave();
+		// wave.init('wavedisplay', 2);
+
 		var osc = WX.SimpleOsc();
 		osc.to(WX.Master);
 
@@ -30,9 +33,10 @@ $(function() {
 		chord.to(WX.Master);
 
 		var kick = WX.Kick();
-		var wave = WX.Wave();
-		wave.init('wavedisplay', 2);
 		kick.to(WX.Master);
+
+		var bass = WX.Bass();
+		bass.to(WX.Master);
 
 		var transport = WH.Transport();
 		transport.setSong(song);
@@ -41,6 +45,7 @@ $(function() {
 		transport.addTarget(2, click);
 		transport.addTarget(3, chord);
 		transport.addTarget(4, kick);
+		transport.addTarget(5, bass);
 
 		// short start delay to allow the app to initialize
 		setTimeout(function() {
